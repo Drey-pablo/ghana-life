@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hemsworthlogan.goatcounter.com; connect-src 'self' https://uwpfxciximmyfvfmphhi.supabase.co wss://uwpfxciximmyfvfmphhi.supabase.co https://hemsworthlogan.goatcounter.com; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"><meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#006b3f"><title>Ghana Life — Accra City Sim</title>
+<style>
+:root{--r:#ce1126;--y:#fcd116;--g:#006b3f;--p:#151a18;--c:#222a26}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#000;color:#eee;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
+#top{position:fixed;top:0;left:0;right:0;display:flex;gap:6px;align-items:center;justify-content:space-between;padding:6px 8px;background:linear-gradient(#000b,#0000);pointer-events:none;font-weight:700;font-size:14px}
+#top>div{background:#000a;border-radius:10px;padding:5px 9px;pointer-events:auto}
+#money{color:var(--y)}#speed button{background:none;border:0;color:#fff;font-size:15px;padding:0 3px;cursor:pointer}#speed .on{color:var(--y)}
+#bottom{position:fixed;left:0;right:0;bottom:0;padding:6px;background:linear-gradient(#0000,#000d 30%)}
+#needs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:6px}
+.nd{font-size:11px;text-align:center}.nb{height:7px;background:#333;border-radius:4px;overflow:hidden}.nb div{height:100%}
+#bar{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+#bar button,.btn{background:var(--g);color:#fff;border:0;border-radius:10px;padding:9px 10px;font-size:14px;font-weight:600;cursor:pointer}
+#bar button{flex:1;min-width:52px;max-width:110px}
+.btn.alt{background:#3a4440}.btn.red{background:var(--r)}.btn.gold{background:var(--y);color:#000}.btn:disabled{opacity:.4}
+#panel{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:5}
+#pbox{background:var(--p);width:100%;max-width:520px;max-height:82vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px;border-top:4px solid var(--y)}
+@media(min-width:700px){#panel{align-items:center}#pbox{border-radius:18px}}
+#pbox h2{margin:0 0 8px;font-size:19px}
+.act{display:flex;justify-content:space-between;align-items:center;background:var(--c);border-radius:10px;padding:8px 10px;margin:5px 0;gap:8px}
+.act small{color:#9ab}.act .btn{padding:7px 10px;font-size:13px;white-space:nowrap}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.app{background:var(--c);border-radius:14px;padding:10px 2px;text-align:center;cursor:pointer;font-size:12px}.app b{display:block;font-size:26px}
+#toast{position:fixed;top:48px;left:50%;transform:translateX(-50%);z-index:9;display:flex;flex-direction:column;gap:4px;align-items:center;pointer-events:none}
+.tst{background:#000d;border:1px solid var(--y);padding:6px 12px;border-radius:12px;font-size:13px;animation:f 4s forwards;max-width:90vw}
+@keyframes f{0%{opacity:0}8%{opacity:1}85%{opacity:1}100%{opacity:0}}
+.chat{background:#0b0f0d;border-radius:10px;padding:8px;height:260px;overflow:auto;font-size:13px}.chat p{margin:3px 0}.chat b{color:var(--y)}
+input,select,textarea{width:100%;padding:9px;border-radius:8px;border:0;margin:4px 0 8px;font-size:15px}
+.kv{display:flex;justify-content:space-between;font-size:14px;padding:3px 0;border-bottom:1px solid #2a332f}
+#start{position:fixed;inset:0;z-index:8;background:radial-gradient(circle at 50% 20%,#0b3d2a,#050807);overflow:auto;padding:16px;display:none}
+#start .box{max-width:480px;margin:auto}
+.flag{height:8px;background:linear-gradient(90deg,var(--r) 33%,var(--y) 33% 66%,var(--g) 66%);border-radius:4px;margin:8px 0}
+.chips label{display:inline-block;background:var(--c);padding:6px 9px;border-radius:14px;margin:3px;font-size:13px}
+#loc{max-width:40vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pie{position:fixed;inset:0;z-index:4;display:none}.pie button{position:absolute;transform:translate(-50%,-50%);background:#fff;color:#111;border:3px solid var(--g);border-radius:22px;padding:8px 12px;font-weight:700;font-size:13px;white-space:nowrap;box-shadow:0 3px 10px #0008;cursor:pointer}.pie .x{background:var(--r);color:#fff;border-color:#fff;border-radius:50%;padding:6px 10px}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div id="top"><div id="money">GH₵0</div><div id="clock">Mon 08:00</div><div id="loc">Accra</div><div id="speed"><button onclick="setSpeed(0)">⏸</button><button onclick="setSpeed(1)">▶</button><button onclick="setSpeed(3)">⏩</button></div></div>
+<div id="bottom"><div id="needs"></div><div id="bar">
+<button onclick="openPhone()">📱 Phone</button><button onclick="openMapApp()">🗺️ Map</button><button onclick="openSim()">🧍 Sim</button><button onclick="thingsHere()">✨ Things</button><button onclick="peopleHere()">👥 People</button><button onclick="goHome()">🏠 Home</button></div></div>
+<div id="panel" onclick="if(event.target===this)closePanel()"><div id="pbox"></div></div>
+<div id="pie" class="pie" onpointerdown="if(event.target===this){hidePie();cv.dispatchEvent(new PointerEvent('pointerdown',{clientX:event.clientX,clientY:event.clientY,pointerType:event.pointerType}))}"></div><div id="toast"></div><div id="start"></div>
+<script>
+"use strict";
+// ================= DATA =================
+const W=48,H=36,T=32;
+const NEEDS=[['h','🍲','Hunger',5.5],['e','⚡','Energy',4],['f','🎉','Fun',4.5],['s','💬','Social',3],['y','🫧','Hygiene',3.5],['b','🚽','Bladder',7]];
+const SKILLS={cooking:'🍳 Cooking',charisma:'😎 Charisma',coding:'💻 Coding',fitness:'💪 Fitness',music:'🎵 Music',hustle:'💼 Hustle',logic:'🧠 Logic',creativity:'🎨 Creativity',business:'📈 Business'};
+const TRAITS={hustler:['Hustler','Hustle grows 50% faster',{sk:'hustle'}],techhead:['Tech Head','Coding grows 50% faster',{sk:'coding'}],smooth:['Smooth Talker','Charisma grows 50% faster',{sk:'charisma'}],musical:['Musical','Music grows 50% faster',{sk:'music'}],sporty:['Sporty','Fitness grows 50% faster',{sk:'fitness'}],bookworm:['Bookworm','Logic grows 50% faster',{sk:'logic'}],foodie:['Foodie','Cooking grows 50% faster',{sk:'cooking'}],artsy:['Artsy','Creativity grows 50% faster',{sk:'creativity'}],bizmind:['Business Mind','Business grows 50% faster',{sk:'business'}],neat:['Neat Freak','Hygiene drops 35% slower',{nd:'y',m:.65}],lazy:['Sleepyhead','Energy drops 30% slower',{nd:'e',m:.7}],party:['Party Starter','Fun drops 30% slower',{nd:'f',m:.7}],butterfly:['Social Butterfly','Social drops 30% slower',{nd:'s',m:.7}]};
+const DREAMS={oga:['👔 Big Boss','Reach the top level of any career'],landlord:['🏡 East Legon Landlord','Net worth of GH₵500,000'],star:['🎤 Highlife Legend','Max out Music (level 10)'],padi:['🤝 Everybody\'s Charley','Best friends with 4 people'],unicorn:['🦄 Accra Unicorn','Get your startup funded at the Tech Hub']};
+const V=[
+['home','My Home','🏠',1,1,5,5,'#8d6e63',0,24],['chop','Auntie Ama Chop Bar','🍲',9,2,4,4,'#d84315',6,22],['market','Central Market','🧺',14,1,5,5,'#f9a825',6,19],
+['ug','University of Ghana','🎓',22,1,10,5,'#5d4037',7,21],['gym','Muscle Gym','🏋️',35,2,4,4,'#455a64',5,22],['church','Gracefield Chapel','⛪',40,2,3,4,'#7986cb',6,21],
+['bank','Gold Coast Bank','🏦',45,2,3,4,'#00695c',8,17],['hospital','Korle Clinic','🏥',1,12,5,5,'#90a4ae',0,24],['office','Ridge Towers','🏢',9,12,5,5,'#546e7a',7,20],
+['tech','Accra Tech Hub','💻',15,12,4,5,'#6a1b9a',7,23],['mall','Accra Mall','🛍️',22,12,6,5,'#c2185b',9,22],['stadium','Sports Stadium','⚽',29,13,4,4,'#2e7d32',8,22],
+['bar','Osu Night Spot','🍻',35,12,4,5,'#311b92',16,28],['studio','Highlife Studio','🎙️',40,12,3,5,'#ad1457',9,23],['salon','Glam Salon','💇',45,13,3,4,'#f06292',7,20],
+['station','Circle Trotro Station','🚐',1,23,5,5,'#ef6c00',5,23],['mosque','Central Mosque','🕌',9,24,4,4,'#00838f',4,22],['school','Legon Basic School','🏫',14,23,5,5,'#1565c0',7,17],
+['hotel','Labadi View Hotel','🏨',22,23,5,5,'#4e342e',0,24],['police','Police Station','🚓',28,24,4,4,'#283593',0,24],['kenkey','Ga Kenkey Kitchen','🫓',35,24,4,4,'#8d6e63',4,20],
+['workshop','Suame Fitting Shop','🔧',40,24,3,4,'#5d4037',7,19],['estate','Estate Agent','🏘️',45,24,3,4,'#558b2f',8,17],['beach','Labadi Beach','🏖️',23,29,3,2,'#ffb74d',6,24]
+].map(a=>({id:a[0],name:a[1],e:a[2],x:a[3],y:a[4],w:a[5],h:a[6],c:a[7],o:a[8],cl:a[9],dx:a[3]+(a[5]>>1),dy:a[4]+a[6]}));
+const VB={};V.forEach(v=>VB[v.id]=v);
+function A(l,m,c,n,sk,x){const d={};(n||'').split(' ').filter(Boolean).forEach(p=>d[p[0]]=+p.slice(1));return Object.assign({l,m,c,d,sk},x||{})}
+const WC=A('🚻 Use washroom',5,1,'b100');
+const ACTS={
+home:[A('🛏️ Sleep (8h)',480,0,'e95',null,{sleep:1}),A('😴 Nap (1h)',60,0,'e18'),A('🍳 Cook a meal',45,15,'h60 f5','cooking'),A('🧊 Snack from cooler',10,8,'h22'),A('🚿 Bath',20,0,'y85'),A('🚽 Toilet',5,0,'b100'),A('📺 Watch TV',60,0,'f28',null,{item:'tv',power:1}),A('🪞 Practise speeches in mirror',30,0,'f-3','charisma'),A('📖 Read a book',60,0,'f6','logic',{item:'books'}),A('🤸 Home workout',30,0,'y-12 e-8','fitness'),A('💻 Code on laptop',60,0,'f5','coding',{item:'laptop',power:1}),A('💻 Freelance gig (Coding 4+)',120,0,'f-5',null,{item:'laptop',power:1,req:['coding',4],earn:180}),A('🎸 Play guitar',60,0,'f15','music',{item:'guitar'}),A('✏️ Sketch designs',60,0,'f8','creativity'),A('📞 Call family',20,2,'s28')],
+chop:[A('🍛 Waakye with shito',20,15,'h45 s5'),A('🐟 Banku & tilapia',40,45,'h70 s10 f6'),A('🥣 Fufu & light soup',40,35,'h68'),A('🍚 Jollof (best in West Africa)',25,30,'h55 f5'),A('🗣️ Gist with the regulars',30,0,'s28','charisma'),WC],
+market:[A('🍌 Buy kelewele',10,10,'h18 f6'),A('🤝 Haggle with traders',60,0,'s15','hustle'),A('🧺 Sell small items',120,20,'e-8 s10','hustle',{earn:70}),A('👀 Browse stalls',30,0,'f12'),WC],
+ug:[A('📚 Attend lecture',180,0,'f-6 s10','logic',{lecture:1}),A('🏛️ Library study',120,0,'','logic'),A('💻 Coding club',120,0,'s12','coding'),A('🎤 Debate society',90,0,'s18','charisma'),A('🎓 Enrol / pay semester fees',5,0,'',null,{enrol:1}),A('🍝 Night market food',20,12,'h40 s5'),WC],
+gym:[A('🏋️ Workout',60,20,'e-15 y-20 f6','fitness'),A('🕺 Aerobics class',60,15,'e-10 s15 f12','fitness'),A('🚿 Shower',15,0,'y80'),WC],
+church:[A('🙏 Attend service',120,0,'s28 f10'),A('🎶 Sing in the choir',90,0,'s15 f8','music'),A('🕯️ Quiet prayer',30,0,'f6'),WC],
+mosque:[A('🤲 Pray',30,0,'f6 s10'),A('📖 Evening lesson',60,0,'s8','logic'),WC],
+bank:[A('🏦 Open banking',1,0,'',null,{app:'bank'}),A('📈 Money class',60,0,'','business')],
+hospital:[A('🩺 Check-up (+health)',60,100,'',null,{heal:25}),A('🛌 Rest in ward',240,200,'e50',null,{heal:15}),WC],
+office:[A('🥪 Networking lunch',60,50,'h40 s20','business'),A('☕ Coffee break',10,10,'e12'),WC],
+tech:[A('⌨️ Hackathon',240,0,'e-25 f15 s15','coding'),A('🚀 Pitch to investors',60,0,'s10',null,{pitch:1}),A('☕ Coffee',10,10,'e14'),WC],
+mall:[A('🎬 Watch a movie',150,60,'f45 s10'),A('🍕 Pizza',30,70,'h50 f10'),A('👗 Shop clothes',45,300,'f22'),A('🛒 Furniture & gadgets',1,0,'',null,{app:'shop'}),WC],
+stadium:[A('🏟️ Watch a league match',120,30,'f40 s20'),A('⚽ Train on the pitch',90,0,'e-20 y-25 f10','fitness'),WC],
+bar:[A('💃 Dance (azonto!)',60,0,'f30 e-10 s20','fitness'),A('🍺 Drinks with friends',60,50,'f25 s30 b-30'),A('🎤 Karaoke',60,20,'f25','music'),A('🎲 Ludo & oware',60,0,'f20 s15','logic'),WC],
+studio:[A('🎧 Record a song',120,150,'f20','music'),A('📝 Write lyrics',60,0,'f5','creativity'),WC],
+salon:[A('💇 Get hair done',90,80,'f15 y20 s10'),A('✂️ Learn braiding',90,0,'','creativity'),WC],
+station:[A('🗣️ Gist with drivers',30,0,'s20','hustle'),A('🚐 Board a trotro',1,0,'',null,{app:'map'}),A('🚻 Public toilet',5,1,'b100')],
+school:[A('🧑‍🏫 Volunteer teaching',120,0,'s15','charisma'),WC],
+hotel:[A('🏊 Pool swim',60,100,'f30 y20','fitness'),A('🍽️ Buffet',60,120,'h80 f10'),A('🛏️ Book a room (8h)',480,300,'e100 y50',null,{sleep:1}),WC],
+police:[A('🏃 Fitness drill',60,0,'e-15','fitness'),A('📝 Report a matter',30,0,'s5')],
+kenkey:[A('🫓 Kenkey & fried fish',15,12,'h45'),A('👩‍🍳 Learn kenkey making',120,0,'f5','cooking'),WC],
+workshop:[A('🔧 Learn fitting',120,0,'y-20','hustle'),A('🛠️ Fix cars for cash',120,0,'y-25','hustle',{earn:90,req:['hustle',3]})],
+estate:[A('🏘️ View homes',1,0,'',null,{app:'homes'}),A('🧾 Property seminar',60,30,'','business')],
+beach:[A('🏊 Swim',60,0,'f30 y-10','fitness'),A('⛱️ Relax under umbrella',60,20,'f30 e10'),A('🥥 Fresh coconut',5,5,'h10'),A('🔥 Beach party',180,30,'f50 s30 e-15'),WC]};
+const DAYS={wk:[0,1,2,3,4],six:[0,1,2,3,4,5],all:[0,1,2,3,4,5,6]};
+const C=[
+['mate','Trotro Mate','station','hustle',0,5,'all',60,'Mate|Senior Mate|Driver|Line Chairman|Transport Owner'],
+['okada','Okada Rider','station','fitness',0,7,'six',70,'Rider|Fast Rider|Dispatch Rider|Fleet Lead|Okada Boss'],
+['kenkey','Kenkey Seller','kenkey','cooking',0,5,'all',50,'Kenkey Seller|Kenkey Maker|Kitchen Head|Kenkey Royalty|Kenkey Empire Owner'],
+['cook','Chop Bar Cook','chop','cooking',0,8,'six',60,'Dishwasher|Cook|Head Cook|Manager|Chop Bar Owner'],
+['trader','Market Trader','market','hustle',0,7,'six',65,'Kayayo|Stall Hand|Trader|Market Queen|Wholesale Magnate'],
+['teacher','Teacher','school','logic',1,7,'wk',110,'NSS Teacher|Teacher|Senior Teacher|Assistant Head|Headteacher'],
+['lecturer','Lecturer','ug','logic',1,9,'wk',160,'Teaching Assistant|Lecturer|Senior Lecturer|Associate Prof|Professor'],
+['banker','Banker','bank','charisma',1,8,'wk',140,'Teller|Relationship Officer|Branch Manager|Regional Head|Managing Director'],
+['dev','Software Developer','tech','coding',0,9,'wk',150,'Intern|Junior Dev|Senior Dev|Tech Lead|CTO'],
+['founder','Startup Founder','tech','business',0,10,'all',80,'Idea Person|Founder|Seed Startup|Series A CEO|Unicorn Founder'],
+['nurse','Nurse','hospital','logic',1,7,'wk',130,'Student Nurse|Staff Nurse|Senior Nurse|Nursing Officer|Matron'],
+['doctor','Doctor','hospital','logic',1,8,'wk',220,'House Officer|Medical Officer|Specialist|Consultant|Medical Director'],
+['guard','Security Guard','office','fitness',0,18,'all',55,'Watchman|Guard|Supervisor|Security Manager|Security Firm Owner'],
+['accountant','Accountant','office','logic',1,8,'wk',130,'Audit Trainee|Accountant|Senior Accountant|Finance Manager|CFO'],
+['lawyer','Lawyer','office','charisma',1,9,'wk',180,'Pupil|Associate|Senior Associate|Partner|Senior Partner'],
+['politician','Politician','office','charisma',1,9,'wk',120,'Assembly Member|DCE|MP|Minister|President'],
+['journalist','Journalist','studio','creativity',0,8,'wk',90,'Stringer|Reporter|Senior Reporter|Editor|Media Mogul'],
+['dj','Radio DJ','studio','music',0,6,'wk',90,'Intern|Presenter|Morning Show Host|Programs Manager|Station Owner'],
+['artist','Musician','studio','music',0,14,'all',70,'Upcoming Act|Club Act|Radio Hit|Award Nominee|Global Star'],
+['footballer','Footballer','stadium','fitness',0,8,'six',100,'Colts Player|Division One|Premier League|National Team|Captain'],
+['hair','Hairdresser','salon','creativity',0,8,'six',60,'Apprentice|Stylist|Senior Stylist|Salon Manager|Salon Chain Owner'],
+['designer','Kente Fashion Designer','mall','creativity',0,9,'six',80,'Sewing Apprentice|Seamstress/Tailor|Designer|Creative Director|Fashion House CEO'],
+['shop','Shop Attendant','mall','charisma',0,9,'all',55,'Attendant|Senior Attendant|Supervisor|Store Manager|Mall Manager'],
+['reception','Hotel Receptionist','hotel','charisma',0,7,'all',70,'Porter|Receptionist|Front Desk Lead|Hotel Manager|Hotel Owner'],
+['chef','Hotel Chef','hotel','cooking',0,10,'all',90,'Kitchen Porter|Line Cook|Sous Chef|Head Chef|Celebrity Chef'],
+['police','Police Officer','police','fitness',0,7,'all',100,'Constable|Corporal|Sergeant|Inspector|Police Commissioner'],
+['fitter','Fitter','workshop','hustle',0,7,'six',65,'Apprentice|Fitter|Master Fitter|Workshop Head|Garage Owner'],
+['trainer','Gym Trainer','gym','fitness',0,6,'six',70,'Floor Assistant|Trainer|Head Coach|Gym Manager|Fitness Brand Owner'],
+['pastor','Pastor','church','charisma',0,8,'all',60,'Usher|Deacon|Evangelist|Pastor|General Overseer'],
+['agent','Estate Agent','estate','business',0,9,'wk',90,'Agent|Senior Agent|Broker|Developer|Real Estate Mogul'],
+['fisher','Fisherman','beach','fitness',0,5,'all',55,'Net Helper|Fisherman|Canoe Captain|Fleet Owner|Fish Magnate']
+].map(a=>({id:a[0],name:a[1],v:a[2],sk:a[3],deg:a[4],st:a[5],days:DAYS[a[6]],dk:a[6],pay:a[7],t:a[8].split('|')}));
+const CB={};C.forEach(c=>CB[c.id]=c);
+const PAYM=[1,1.6,2.5,4,7];
+const HOMES=[['Nima Compound Room',150,.6],['Madina Chamber & Hall',400,.8],['Osu Self-Contain',900,1],['East Legon House',2500,1.2],['Trasacco Mansion',9000,1.4],['UG Hall Room (students)',80,.7]];
+const SHOP=[['laptop','💻 Laptop',2500],['guitar','🎸 Guitar',600],['tv','📺 Flat TV',1200],['books','📚 Bookshelf',300],['ac','❄️ Air conditioner (better sleep)',3000],['gen','🔌 Generator (beats dumsor)',3500],['car','🚗 Used Toyota (cheap travel)',45000]];
+const FIRST_M=['Kwame','Kofi','Yaw','Kwabena','Kwaku','Kwesi','Kojo','Fuseini','Mawuli','Selasi','Nii','Elikem','Kobby','Bright'];
+const FIRST_F=['Ama','Akosua','Abena','Efua','Adwoa','Yaa','Afia','Esi','Naa','Adjoa','Selorm','Ayisha','Dzifa','Akua'];
+const LAST=['Mensah','Owusu','Boateng','Asante','Osei','Agyeman','Addo','Quaye','Tetteh','Amoah','Iddrisu','Abubakar','Ankrah','Badu','Sarpong','Lamptey'];
+const pick=a=>a[Math.floor(Math.random()*a.length)],R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,cl=v=>Math.max(0,Math.min(100,v));
+const fmt=n=>'GH₵'+Math.round(n).toLocaleString('en-US');
+const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+// ================= MAP =================
+const G=[];const BM=[];
+for(let y=0;y<H;y++){G.push([]);BM.push([]);for(let x=0;x<W;x++){let t=0;if(y>=32)t=3;else if(y>=29)t=2;else if([6,17,28].includes(y)||[7,20,33,44].includes(x))t=1;G[y].push(t);BM[y].push(null)}}
+V.forEach(v=>{for(let y=v.y;y<v.y+v.h;y++)for(let x=v.x;x<v.x+v.w;x++){G[y][x]=4;BM[y][x]=v.id}});
+const TREES=[];let seed=7;const sr=()=>(seed=(seed*9301+49297)%233280)/233280;
+for(let i=0;i<120;i++){const x=Math.floor(sr()*W),y=Math.floor(sr()*29);if(G[y][x]===0)TREES.push([x,y,sr()<.5?'🌴':'🌳'])}
+const walk=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&G[y][x]!==3&&G[y][x]!==4;
+function path(sx,sy,tx,ty){sx=Math.round(sx);sy=Math.round(sy);if(!walk(tx,ty))return null;const prev=new Map(),q=[[sx,sy]],k=(x,y)=>y*W+x;prev.set(k(sx,sy),-1);let qi=0;
+ while(qi<q.length){const [x,y]=q[qi++];if(x===tx&&y===ty){const p=[];let c=k(x,y);while(c!==-1){p.unshift([c%W,Math.floor(c/W)]);c=prev.get(c)}p.shift();return p}
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(walk(nx,ny)&&!prev.has(k(nx,ny))){prev.set(k(nx,ny),k(x,y));q.push([nx,ny])}}}return null}
+// ================= STATE =================
+let S=null,speed=1,panelOpen=false,soundOn=false,busy=false;
+const P={x:3,y:6,path:[],face:1,goal:null,talk:null};
+function newState(o){const rich=o.rich,hl=o.student?5:rich?3:0;
+ const n={v:3,name:o.name,gender:o.gender,traits:o.traits,dream:o.dream,rich,student:!!o.student,gen:o.gen||1,
+ t:8*60,age:18,health:100,money:o.money!=null?o.money:(rich?20000:800)+(o.student?500:0),bank:0,
+ needs:{h:80,e:90,f:70,s:60,y:80,b:80},skills:Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0])),
+ home:hl,dadPays:rich&&!o.student,rentBehind:0,loan:rich?0:2000,loanPay:250,items:rich?['tv','laptop','car','ac']:[],
+ job:null,credits:0,enrolled:!!o.student,semPaidDay:0,degree:false,
+ npcs:null,goals:{},ach:{},log:[],gist:[],lastEventDay:-1,lastRentDay:-1,power:true,powerDay:-1,kids:0,spouse:null,funded:false,lifespan:R(74,95),stats:{shifts:0,earned:0,spent:0}};
+ n.log.unshift(rich?'🎲 Born a Big Man Pikin in East Legon — Daddy pays the rent and there is a car in the garage.':'🎲 Born a Hustle Pikin in Nima — you took a GH₵2,000 susu loan to start.');
+ return n}
+const NPCN=[['Kofi Boateng','👨🏿','m'],['Ama Owusu','👩🏿','f'],['Nii Lamptey','🧔🏿','m'],['Akosua Asante','👩🏾','f'],['Yaw Mensah','👨🏾','m'],['Efua Quaye','👩🏿‍🦱','f'],['Fuseini Iddrisu','👳🏿‍♂️','m'],['Selorm Tetteh','👩🏾‍🦱','f'],['Kwesi Addo','🧑🏿','m'],['Abena Sarpong','👩🏿‍💼','f'],['Elikem Ankrah','👨🏿‍💻','m'],['Ayisha Abubakar','🧕🏿','f'],['Bright Badu','👨🏿‍🎤','m'],['Naa Amoah','👩🏾‍🎤','f']];
+function mkNPCs(){return NPCN.map(a=>{const v=pick(V);return{name:a[0],e:a[1],g:a[2],x:v.dx,y:v.dy,rel:R(0,15),st:'stranger',trait:pick(Object.keys(TRAITS)),job:pick(C).name,path:[],wait:R(0,200),chat:[]}})}
+let NPC=[];
+// ================= HELPERS =================
+const $=id=>document.getElementById(id);
+const day=()=>Math.floor(S.t/1440),dow=()=>day()%7,hr=()=>(S.t%1440)/60;
+const hhmm=t=>{const m=Math.floor(t%1440);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const sl=k=>Math.floor(S.skills[k]);
+const mood=()=>Object.values(S.needs).reduce((a,b)=>a+b,0)/6;
+const curV=()=>S&&S.scene?VB[S.scene]:V.find(v=>Math.round(P.x)===v.dx&&Math.round(P.y)===v.dy&&!P.path.length);
+function isOpen(v){const h=hr();if(v.cl>24)return h>=v.o||h<v.cl-24;return h>=v.o&&h<v.cl}
+function toast(m){const tc=$('toast');while(tc.children&&tc.children.length>2)tc.removeChild(tc.firstChild);const d=document.createElement('div');d.className='tst';d.innerHTML=m;$('toast').appendChild(d);setTimeout(()=>d.remove(),4000);beep(660)}
+function log(m){S.log.unshift(`<small>${DOW[dow()]} d${day()+1} ${hhmm(S.t)}</small> ${m}`);if(S.log.length>200)S.log.length=200}
+let AC=null;function beep(f){if(!soundOn)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+.08)}catch(e){}}
+function panel(h){hidePie();$('pbox').innerHTML=h+`<div style="margin-top:10px;text-align:right"><button class="btn alt" onclick="closePanel()">Close (Esc)</button></div>`;$('panel').style.display='flex';panelOpen=true}
+function closePanel(){$('panel').style.display='none';panelOpen=false}
+function save(){if(!S)return;S.npcs=NPC.map(n=>Object.assign({},n,{path:[]}));S.px=S.scene?P.cx:Math.round(P.x);S.py=S.scene?P.cy:Math.round(P.y);try{localStorage.setItem('ghanaLife2',JSON.stringify(S))}catch(e){}}
+function addSkill(k,hours){if(!k)return;let r=.35*hours*(.5+mood()/100);for(const t of S.traits)if(TRAITS[t][2].sk===k)r*=1.5;const before=sl(k);S.skills[k]=Math.min(10,S.skills[k]+r/(1+S.skills[k]*.25));if(sl(k)>before){toast(`${SKILLS[k]} reached level ${sl(k)}!`);if(sl(k)>=2)goal('skill2')}}
+const workday=(c,d)=>c.days.includes(((d%7)+7)%7);
+// ================= TIME =================
+function advance(mins,deltas,skill){let left=mins;while(left>0&&!S.dead){const s=Math.min(10,left);tick(s,mins,deltas);left-=s}if(skill)addSkill(skill,mins/60)}
+function tick(m,tot,deltas){const prevDay=day(),prevH=hr();S.t+=m;
+ for(const [k,,,r] of NEEDS){let rate=r;for(const t of S.traits){const e=TRAITS[t][2];if(e.nd===k)rate*=e.m}
+  if(!(deltas&&deltas[k]>0))S.needs[k]=cl(S.needs[k]-rate*m/60);if(deltas&&deltas[k])S.needs[k]=cl(S.needs[k]+deltas[k]*m/tot)}
+ const zero=Object.values(S.needs).filter(v=>v<=0).length;if(zero)S.health=cl(S.health-zero*m/240);else if(mood()>50)S.health=cl(S.health+m/300);
+ if(S.age>50)S.health=cl(S.health-(S.age-50)*m/40000);
+ if(day()!==prevDay)newDay(prevDay);
+ if(dow()===5&&prevH<9&&hr()>=9&&S.lastRentDay!==day())payRent();
+ if(hr()>=7&&(prevH<7||day()!==prevDay)&&S.lastEventDay!==day()){S.lastEventDay=day();if(Math.random()<.4)pendingEvent=true}
+ autoWork(prevH,prevDay);
+}
+let pendingEvent=false;
+function newDay(prev){
+ if(S.job){const c=CB[S.job.id];if(workday(c,prev)&&prev>=S.job.startDay&&S.job.lastWorked!==prev){S.job.perf=Math.max(0,S.job.perf-25);S.job.miss++;log(`❌ Missed your ${c.name} shift. Performance down.`);toast('❌ You missed your shift!');if(S.job.miss>=3){log(`🔥 Fired from ${c.name} for missing shifts.`);toast('🔥 You were FIRED.');S.job=null}}}
+ if(S.powerDay!==day())S.power=true;
+ if(day()>0&&day()%28===0)birthday();
+ if(S.enrolled&&day()-S.semPaidDay>=28){S.enrolled=false;toast('🎓 Semester ended. Re-enrol at UG to keep studying.')}
+ gistTick();gistTick();
+}
+function payRent(){S.lastRentDay=day();const h=HOMES[S.home];let msg;
+ if(S.dadPays)msg=`🧾 Saturday: Daddy paid your ${h[0]} rent.`;
+ else{S.money-=h[1];msg=`🧾 Saturday rent ${fmt(h[1])} paid for ${h[0]}.`;
+  if(S.money<0){S.rentBehind++;msg=`⚠️ Couldn't cover rent! ${S.rentBehind} week${S.rentBehind>1?'s':''} behind.`;
+   if(S.rentBehind>=2&&S.home!==0){S.home=0;S.rentBehind=0;S.money=0;msg+=' 🚪 Quit notice served — EVICTED to a Nima compound room.';ach('evicted','Evicted! Landlord no dey play')}}else{S.rentBehind=0;goal('rent')}}
+ if(S.loan>0){const p=Math.min(S.loan,S.loanPay);S.money-=p;S.loan-=p;msg+=` Susu repayment ${fmt(p)} (${fmt(S.loan)} left).`}
+ if(S.bank>0){const i=S.bank*.01;S.bank+=i;msg+=` Bank interest +${fmt(i)}.`}
+ log(msg);toast(msg)}
+function autoWork(prevH,prevDay){if(!S.job||!S.job.auto||busy)return;const c=CB[S.job.id];if(prevDay===day()&&workday(c,day())&&prevH<c.st&&hr()>=c.st&&S.job.lastWorked!==day()&&day()>=S.job.startDay){const v=VB[c.v];leaveScene();P.x=v.dx;P.y=v.dy;P.path=[];S.money-=5;toast(`🚐 Auto: trotro to ${v.name} (GH₵5)`);pendingShift=true}}
+let pendingShift=false;
+function birthday(){S.age++;log(`🎂 Happy birthday! You are now ${S.age}.`);toast(`🎂 You are now ${S.age}! (1 game month = 1 year of life)`);if(S.age===30)ach('thirty','Thirty and thriving');if(S.age===60)ach('elder','Respected elder (60)');
+ if(S.health<=0||S.age>=S.lifespan)die()}
+// ================= ACTIONS =================
+function actErr(vid,a){const v=VB[vid];if(vid!=='home'&&!isOpen(v))return `${v.name} is closed now (${v.o}:00–${v.cl%24}:00).`;
+ if(a.item&&!S.items.includes(a.item))return 'You need to buy one first (Accra Mall or 🔨 Build mode).';
+ if(a.power&&!S.power&&!S.items.includes('gen'))return '⚡ Dumsor! No light for that. Buy a generator.';
+ if(a.req&&sl(a.req[0])<a.req[1])return `Needs ${SKILLS[a.req[0]]} ${a.req[1]}.`;if(S.money<a.c)return 'Not enough money. 💸';
+ if(a.lecture&&!S.enrolled)return 'Enrol at UG first to earn credits.';return null}
+function actDeltas(vid,a){const d=Object.assign({},a.d);if(vid==='home'&&a.sleep)d.e=Math.round(95*HOMES[S.home][2]*(S.items.includes('ac')?1.1:1));return d}
+function actFinish(vid,a){if(a.sk)addSkill(a.sk,a.m/60);if(a.heal)S.health=cl(S.health+a.heal);
+ if(a.earn){const e=Math.round(a.earn*(1+sl(a.req?a.req[0]:(a.sk||'hustle'))*.1));S.money+=e;S.stats.earned+=e;toast(`+${fmt(e)}`)}
+ if(a.lecture){S.credits++;if(S.credits>=24&&!S.degree){S.degree=true;S.enrolled=false;log('🎓 GRADUATED from University of Ghana! Degree jobs unlocked.');toast('🎓 GRADUATED! Degree jobs unlocked.');ach('grad','Legon graduate')}}
+ if(a.d.h>0)goal('eat');if(vid==='beach')goal('beach');beep(520)}
+function doAct(vid,i){const a=ACTS[vid][i];
+ if(a.app){closePanel();return({bank:openBank,shop:openShop,homes:openHomes,map:openMapApp})[a.app]()}
+ if(a.enrol)return enrol();if(a.pitch){const v=VB[vid];if(!isOpen(v))return toast('Closed now.');return pitch()}
+ const err=actErr(vid,a);if(err)return toast(err);
+ S.money-=a.c;S.stats.spent+=a.c;busy=true;advance(a.m,actDeltas(vid,a),null);busy=false;actFinish(vid,a);
+ if(!S.dead&&!S.scene)thingsHere()}
+function enrol(){if(S.degree)return toast('You already have a degree!');if(S.enrolled)return toast('Already enrolled this semester.');const fee=S.rich?0:1200;if(S.money<fee)return toast(`Semester fees are ${fmt(fee)}.`);S.money-=fee;S.enrolled=true;S.semPaidDay=day();goal('enrol');log(`🎓 Enrolled at University of Ghana${fee?' ('+fmt(fee)+')':' — Daddy paid'}.`);toast('🎓 Enrolled for 4 weeks! Attend lectures for credits (24 to graduate).');if(!S.scene)thingsHere()}
+function pitch(){if(S.funded)return toast('Already funded!');if(sl('business')<6||sl('coding')<4)return toast('Investors want Business 6 + Coding 4.');advance(60);if(Math.random()<.5+sl('charisma')*.05){S.funded=true;S.money+=50000;log('🦄 Your startup got FUNDED: GH₵50,000!');toast('🦄 FUNDED! +GH₵50,000');ach('unicorn','Accra Unicorn')}else toast('Investors said "come back with traction".')}
+// ================= WORK =================
+function shiftErr(auto){if(!S.job)return 'No job.';const c=CB[S.job.id],v=VB[c.v],h=hr();
+ if(!workday(c,day()))return 'Not a working day.';if(day()<S.job.startDay)return 'Your job starts tomorrow.';
+ if(S.job.lastWorked===day())return 'Already worked today.';if(h<c.st-1||h>c.st+1)return `Clock in between ${c.st-1}:00 and ${c.st+1}:00.`;
+ if(!auto&&curV()!==v)return `Go to ${v.name} for your shift.`;if(S.needs.e<15||S.needs.h<10)return 'Too tired/hungry to work. Eat and rest first.';return null}
+function doShift(auto){const e=shiftErr(auto);if(e)return toast(e);const m=mood();busy=true;advance(240,{f:-10,s:5});busy=false;shiftDone(m)}
+function shiftDone(m){if(!S.job)return;const c=CB[S.job.id];addSkill(c.sk,4);
+ const pay=Math.round(c.pay*PAYM[S.job.lvl]);S.money+=pay;S.stats.earned+=pay;S.stats.shifts++;S.job.lastWorked=day();S.job.miss=0;S.job.shifts++;
+ const gain=Math.round(8+m/6);S.job.perf=Math.min(100,S.job.perf+gain);
+ log(`💼 Worked a ${c.t[S.job.lvl]} shift. +${fmt(pay)}, performance +${gain}%.`);toast(`💼 Shift done +${fmt(pay)}`);goal('shift');
+ if(S.job.perf>=100)tryPromo();else if(panelOpen)thingsHere()}
+function tryPromo(){const c=CB[S.job.id],L=S.job.lvl;if(L>=4)return;const need=(L+1)*2;
+ if(sl(c.sk)<need)return toast(`Performance maxed! Need ${SKILLS[c.sk]} ${need} for promotion.`);
+ if(L===3)return panel(`<h2>🪑 Board interview</h2><p>The board asks: "Why should we make you ${c.t[4]}?"</p>
+ <button class="btn" onclick="interview(1)">"I have delivered results all year."</button><br><br><button class="btn" onclick="interview(2)">"My uncle knows the chairman."</button><br><br><button class="btn" onclick="interview(3)">Crack a joke to win them over</button>`);
+ promote()}
+function interview(k){closePanel();const ch={1:.5+sl('charisma')*.05,2:.25,3:.2+sl('charisma')*.07}[k];if(Math.random()<ch)promote();else{S.job.perf=60;toast('The board said "not yet".');log('Board interview failed.')}}
+function promote(){const c=CB[S.job.id];S.job.lvl++;S.job.perf=0;log(`🎉 PROMOTED to ${c.t[S.job.lvl]}!`);toast(`🎉 PROMOTED: ${c.t[S.job.lvl]}`);ach('promo','First promotion');S.needs.f=cl(S.needs.f+20);if(S.job.lvl===4){ach('top','Top of the ladder');if(S.dream==='oga')dreamDone()}}
+function applyJob(id){const c=CB[id];if(c.deg&&!S.degree)return toast('This job needs a university degree.');S.job={id,lvl:0,perf:0,miss:0,startDay:day()+1,lastWorked:-1,auto:false,shifts:0};log(`📝 Hired as ${c.t[0]} (${c.name}). Starts tomorrow.`);toast(`📝 Hired! ${c.t[0]} — starts tomorrow ${c.st}:00 at ${VB[c.v].name}`);goal('job');openJobs()}
+// ================= EVENTS =================
+const EV=[
+{t:'🌫️ Harmattan is here. Dusty winds, cracked lips, cold mornings.',o:[['Buy shea butter (GH₵30)',()=>{S.money-=30;S.needs.y=cl(S.needs.y+20);return'Skin glowing.'}],['Tough it out',()=>{S.health=cl(S.health-8);return'You caught a catarrh.'}]]},
+{t:'⚽ The Black Stars play a big qualifier tonight!',o:[['Watch with the area boys',()=>{const w=Math.random()<.55;S.needs.f=cl(S.needs.f+(w?35:-15));S.needs.s=cl(S.needs.s+25);if(w)ach('stars','Black Stars faithful');return w?'GHANA WINS! The street is jubilating 🇬🇭':'We lost. Heartbreak everywhere.'}],['Bet GH₵100 on Ghana',()=>{if(S.money<100)return'You no get money to bet.';const w=Math.random()<.45;S.money+=w?150:-100;return w?'Your bet paid GH₵250!':'Lost the bet. Chale.'}]]},
+{t:'💡 DUMSOR! The lights are off in your area today.',o:[['Light candles and vibe',()=>{S.power=false;S.powerDay=day();ach('dumsor','Dumsor survivor');return'No TV or laptop at home today unless you own a generator.'}],['Run the generator (GH₵80 fuel)',()=>{S.power=false;S.powerDay=day();if(S.items.includes('gen')){S.money-=80;return'Generator dey roar. Light on!'}return'You have no generator. Buy one at the mall.'}]]},
+{t:'⚰️ A relative passed away. The funeral is this Saturday in your hometown.',o:[['Attend in black & red, contribute GH₵300',()=>{S.money-=300;S.needs.s=cl(S.needs.s+30);S.needs.f=cl(S.needs.f-20);return'The family appreciated your presence.'}],['Send condolences only',()=>{S.needs.s=cl(S.needs.s-15);return'Aunties are talking about you.'}]]},
+{t:'📱 A family member needs "small money for an urgent matter".',o:[['Send GH₵200 by MoMo',()=>{S.money-=200;S.needs.s=cl(S.needs.s+15);return'Blessings rained on you.'}],['Pretend network is bad',()=>'"Hello? Hello? I can\'t hear you..."']]},
+{t:'💰 A friend invites you into a "double your money" gold scheme.',o:[['Invest GH₵1,000',()=>{if(S.money<1000)return'You no get.';S.money-=1000;if(Math.random()<.15){S.money+=2000;return'It paid... this time.'}return'Scheme collapsed. Money gone.'}],['Refuse',()=>'Wise move.']]},
+{t:'🦟 You woke up with malaria symptoms.',o:[['Go to the clinic (GH₵120)',()=>{S.money-=120;S.health=cl(S.health-3);return'Treated fast.'}],['Drink herbal bitters',()=>{S.health=cl(S.health-R(5,20));S.needs.e=cl(S.needs.e-30);return'You suffered for days.'}]]},
+{t:'🚓 Police checkpoint: "Charley, find something for the boys".',o:[['Give GH₵20',()=>{S.money-=20;return'Waved through.'}],['Politely refuse',()=>{if(Math.random()<.5){S.t+=90;return'Delayed 90 minutes.'}return'Officer smiled and let you go.'}]]},
+{t:'🥁 Homowo festival! Kpokpoi and drumming everywhere.',o:[['Join the celebration',()=>{S.needs.f=cl(S.needs.f+35);S.needs.s=cl(S.needs.s+30);S.needs.h=cl(S.needs.h+30);return'Best day of the year!'}],['Rest at home',()=>{S.needs.e=cl(S.needs.e+20);return'You rested.'}]]},
+{t:'💒 Wedding invite! The matching cloth costs GH₵250.',o:[['Buy cloth & attend',()=>{if(S.money<250)return'No money for the cloth.';S.money-=250;S.needs.s=cl(S.needs.s+35);S.needs.f=cl(S.needs.f+25);return'The jollof was elite.'}],['Decline',()=>'You stayed home.']]},
+{t:'📉 The cedi fell sharply against the dollar this week.',o:[['Move half your cash to the bank',()=>{const x=Math.max(0,S.money*.5);S.bank+=x;S.money-=x;return'Half your cash moved to savings.'}],['Ignore it',()=>{if(S.money>0)S.money*=.95;return'Prices went up; your cash lost 5%.'}]]},
+{t:'🗳️ Election season! A party agent offers GH₵100 for your vote.',o:[['Take the money',()=>{S.money+=100;return'Money dey, conscience small.'}],['Vote your conscience',()=>{S.needs.f=cl(S.needs.f+10);ach('voter','Proud voter');return'You inked your finger proudly.'}]]},
+{t:'🌧️ Heavy rain flooded the roads around Circle.',o:[['Wade through',()=>{S.needs.y=cl(S.needs.y-40);return'Gutter water everywhere...'}],['Wait it out',()=>{S.t+=120;return'Lost 2 hours waiting.'}]]},
+{t:'📜 WASSCE results are out — your little cousin passed!',o:[['Throw a small party (GH₵150)',()=>{S.money-=150;S.needs.s=cl(S.needs.s+30);return'The family is proud.'}],['Send congrats',()=>{S.needs.s=cl(S.needs.s+10);return'Cousin is happy.'}]]},
+{t:'🇬🇭 NSS postings are out. A friend begs you to help them relocate to Accra.',o:[['Help them move',()=>{S.needs.e=cl(S.needs.e-20);S.needs.s=cl(S.needs.s+25);return'They owe you one.'}],['Too busy',()=>'They understand... maybe.']]}];
+function randomEvent(){if(!S||S.dead)return;const i=R(0,EV.length-1),e=EV[i];panel(`<h2>📢 ${DOW[dow()]} morning</h2><p>${e.t}</p>`+e.o.map((o,j)=>`<button class="btn" style="width:100%;margin:4px 0" onclick="chooseEv(${i},${j})">${o[0]}</button>`).join(''))}
+function chooseEv(i,j){const r=EV[i].o[j][1]();log(EV[i].t+' → '+r);closePanel();toast(r)}
+// ================= NPC / SOCIAL =================
+const LINES={greet:['Chale, how far?','Ete sen! Long time.','Hello o, how is work?','Bra, you dey?','Akwaaba, my friend!'],
+ topic:['This trotro fare increase dey worry me paa.','Did you watch the Black Stars? Hmm.','Dumsor is back, I swear.','I dey hustle small small, God dey.','Have you tried the new waakye joint by the station?','Rent in Osu is crazy now!','I want to go and sit at Labadi this weekend.','Have you heard the new highlife jam?'],
+ reply:['Haha, true talk!','Eiii, you no serious 😂','Me too, chale.','You make sense paa.','I hear you.']};
+const near=n=>Math.hypot(n.x-cpx(),n.y-cpy())<3.5;
+function peopleHere(){const ns=NPC.filter(near);panel(`<h2>👥 People nearby</h2>`+(ns.length?ns.map(npcRow).join(''):'<p>Nobody close. People move around the city all day — try busy spots.</p>'))}
+function npcRow(n){return `<div class="act"><div>${n.e} <b>${n.name}</b><br><small>${n.job} · ${stLabel(n)} · ❤️ ${Math.round(n.rel)}</small></div><button class="btn" onclick="talkTo(${NPC.indexOf(n)})">Interact</button></div>`}
+function stLabel(n){return{stranger:'Stranger',acq:'Acquaintance',friend:'Friend',best:'Best friend',dating:'Dating 💕',engaged:'Engaged 💍',spouse:'Spouse 💍'}[n.st]}
+function updSt(n){if(['dating','engaged','spouse'].includes(n.st))return;const o=n.st;n.st=n.rel>=80?'best':n.rel>=40?'friend':n.rel>=10?'acq':'stranger';if(o!==n.st&&n.st==='friend')goal('friend');if(n.st==='best'&&NPC.filter(x=>x.st==='best').length>=4&&S.dream==='padi')dreamDone()}
+function talkTo(i){const n=NPC[i];if(!n.chat.length)n.chat.push([n.name,pick(LINES.greet)]);const c0=near(n);
+ const bt=(f,l,ok)=>`<button class="btn ${ok?'':'alt'}" ${ok?'':'disabled'} style="margin:3px" onclick="${f}">${l}</button>`,rom=['dating','engaged','spouse'].includes(n.st);
+ panel(`<h2>${n.e} ${n.name}</h2><small>${n.job} · ${TRAITS[n.trait][0]} · ${stLabel(n)} · ❤️ ${Math.round(n.rel)}</small>
+ <div class="chat" id="npcchat">${n.chat.slice(-30).map(c=>`<p><b>${c[0]}:</b> ${c[1]}</p>`).join('')}</div>
+ <input id="say" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sayTo(${i})">
+ ${bt(`sayTo(${i})`,'Send',1)}${bt(`soc(${i},'gist')`,'🗣️ Gist',c0)}${bt(`soc(${i},'joke')`,'😂 Joke',c0)}${bt(`soc(${i},'compliment')`,'🌹 Compliment',c0)}${bt(`soc(${i},'flirt')`,'😘 Flirt',c0&&n.rel>=25)}${bt(`soc(${i},'date')`,'🍷 Date (GH₵100)',c0&&n.rel>=40&&!rom)}${bt(`soc(${i},'propose')`,'💍 Knocking (GH₵3,000)',n.st==='dating'&&n.rel>=75)}${bt(`soc(${i},'marry')`,'💒 Wedding (GH₵5,000)',n.st==='engaged')}${bt(`soc(${i},'baby')`,'👶 Try for a baby',n.st==='spouse')}${bt(`soc(${i},'gift')`,'🎁 Send GH₵100 MoMo',1)}
+ ${c0?'':'<p><small>📱 Texting from afar. Walk up to them for more options.</small></p>'}`);const c=$('npcchat');if(c)c.scrollTop=1e5}
+function sayTo(i){const n=NPC[i],el=$('say'),m=((el&&el.value)||'').trim();if(!m)return;n.chat.push(['You',m.replace(/</g,'&lt;')]);let r;const lm=m.toLowerCase();
+ if(/love|marry|cute|fine/.test(lm))r=n.rel>50?'Hehe, you this person 🙈':'Ehh, slow down chale 😂';else if(/money|loan|borrow/.test(lm))r='Me too I dey find money o.';else if(/job|work/.test(lm))r=`Work as ${n.job} dey stress me but we move.`;else if(/\?$/.test(m))r=pick(['I no know o 🤷🏿','Hmm, maybe.','Ask me later, I dey busy.','Sure!']);else r=pick(LINES.reply.concat(LINES.topic));
+ n.chat.push([n.name,r]);n.rel=Math.min(100,n.rel+1);S.needs.s=cl(S.needs.s+3);updSt(n);talkTo(i)}
+function soc(i,k){const n=NPC[i];let ok=Math.random()<.55+sl('charisma')*.04+n.rel/200,txt;
+ if(S.needs.y<20&&k!=='gift'){ok=false;txt=`${n.name} covered their nose. 😷 (Bathe first!)`;n.rel-=3}
+ else switch(k){
+ case'gist':advance(20,{s:20},'charisma');n.rel+=ok?R(3,7):-2;txt=ok?pick(LINES.topic):'They seem bored.';break;
+ case'joke':advance(10,{f:10,s:10},'charisma');n.rel+=ok?R(4,9):-4;txt=ok?'😂😂 You too funny!':'...that was not funny.';break;
+ case'compliment':advance(5,{s:8});n.rel+=ok?R(3,6):-1;txt=ok?'Aww, thank you!':'Okay...';break;
+ case'flirt':advance(10,{s:12,f:6},'charisma');n.rel+=ok?R(5,10):-8;txt=ok?'🙈 Stop it!':'Please respect yourself 😒';break;
+ case'date':if(S.money<100)return toast('Need GH₵100');S.money-=100;advance(120,{f:30,s:35,h:30});if(ok){n.st='dating';n.rel+=10;txt='That was lovely. Let\'s do this again 💕';ach('date','First date')}else{n.rel-=5;txt='I think we are better as friends.'}break;
+ case'propose':if(S.money<3000)return toast('Knocking items (schnapps, cloth, etc.) cost GH₵3,000.');S.money-=3000;if(Math.random()<n.rel/100+.1){n.st='engaged';txt='YES! Let your family come and knock! 💍'}else{n.st='friend';n.rel-=30;txt='I\'m not ready... sorry.'}break;
+ case'marry':if(S.money<5000)return toast('Wedding costs GH₵5,000.');S.money-=5000;n.st='spouse';S.spouse=n.name;n.rel=100;txt='We are married!!! 💒';ach('married','Happily married');S.needs.f=100;S.needs.s=100;log(`💒 Married ${n.name}.`);break;
+ case'baby':advance(60,{f:20,s:20});if(day()-(S.lastBaby??-99)>=28&&Math.random()<.35){S.kids++;S.lastBaby=day();const kn=pick(Math.random()<.5?FIRST_F:FIRST_M);txt=`👶 Baby ${kn} is here! Outdooring on the 8th day.`;ach('parent','Proud parent');log(`👶 Your child ${kn} was born.`)}else txt='No baby news yet.';break;
+ case'gift':if(S.money<100)return toast('Need GH₵100');S.money-=100;n.rel+=8;txt='Ei, God bless you! 🙏🏿';break}
+ n.rel=Math.max(0,Math.min(100,n.rel));updSt(n);n.chat.push([n.name,txt]);talkTo(i)}
+const GISTN=['KwakuTheHustler','AccraBaddie','LegonBoy','ChaleWote','KumasiKing','JollofQueen','TroTroTalk','OsuNights','WaakyeLover','BlackStarsFan','DumsorVictim','KantamantoPlug'];
+const GISTL=['Who dey Labadi now?','Rent day tomorrow, pray for me 🙏🏿','Just got promoted to Senior Mate 😂','Any banker job opening?','Dumsor again for Madina 😤','Auntie Ama waakye is unmatched','Looking for a gym partner at Muscle Gym','Party at Osu Night Spot tonight!!','Who wants to play oware?','Legon lectures are killing me','How do I get my coding skill up fast?','Black Stars go win this one 🇬🇭','Trotro mate cheated me of my change 😭','Anybody selling a used Toyota?','East Legon people, how the AC dey?'];
+function gistTick(){S.gist.push([pick(GISTN),pick(GISTL),hhmm(S.t)]);if(S.gist.length>80)S.gist.shift()}
+// ================= PHONE APPS =================
+function openPhone(){panel(`<h2>📱 Phone</h2><div class="apps">${[['💼','Jobs','openJobs()'],['🗺️','Map','openMapApp()'],['🏦','Bank','openBank()'],['🏘️','Homes','openHomes()'],['🛵','ChopNow','openFood()'],['👥','Contacts','openContacts()'],['💬','Gist','openGist()'],['🧍','My Sim','openSim()'],['🎯','Goals','openGoals()'],['🏆','Awards','openAch()'],['📰','Diary','openLog()'],['⚙️','Settings','openSettings()']].map(a=>`<div class="app" onclick="${a[2]}"><b>${a[0]}</b>${a[1]}</div>`).join('')}</div>`)}
+const dname=k=>k==='wk'?'Mon–Fri':k==='six'?'Mon–Sat':'Every day';
+function openJobs(){let h='<h2>💼 Jobs</h2>';
+ if(S.job){const c=CB[S.job.id],L=S.job.lvl;h+=`<div class="act"><div><b>${c.t[L]}</b> · ${c.name}<br><small>${VB[c.v].e} ${VB[c.v].name} · ${c.st}:00–${c.st+4}:00 · ${dname(c.dk)}<br>Pay ${fmt(c.pay*PAYM[L])}/shift · Performance ${Math.round(S.job.perf)}% · ${L<4?`Next: ${c.t[L+1]} needs 100% + ${SKILLS[c.sk]} ${(L+1)*2}`:'Top level!'}</small></div></div>
+ <div class="chips"><label><input type="checkbox" style="width:auto" ${S.job.auto?'checked':''} onchange="S.job.auto=this.checked"> Go to work automatically (GH₵5 trotro)</label></div>
+ <button class="btn" onclick="closePanel();clockIn()">⏱️ Clock in</button> <button class="btn red" onclick="if(confirm('Quit job?')){S.job=null;openJobs()}">Quit</button><hr>`}
+ h+='<p><small>Shifts are 4 hours. Be at the workplace within an hour of the start. 🎓 = degree needed.</small></p>'+C.map(c=>`<div class="act"><div>${VB[c.v].e} <b>${c.name}</b> ${c.deg?'🎓':''}<br><small>${c.t[0]} · ${fmt(c.pay)}/shift · ${c.st}:00 ${dname(c.dk)} · ${SKILLS[c.sk]} · top: ${c.t[4]} ${fmt(c.pay*7)}</small></div><button class="btn" ${c.deg&&!S.degree?'disabled':''} onclick="applyJob('${c.id}')">Apply</button></div>`).join('');panel(h)}
+function fare(v){const d=cdist(v);return S.items.includes('car')?1:Math.round(3+d*.2)}
+function openMapApp(){panel('<h2>🗺️ Travel</h2><p><small>Walk for free (tap the map / arrow keys) or ride a trotro: GH₵3 + distance. '+(S.items.includes('car')?'🚗 Your car: GH₵1 fuel per trip.':'')+'</small></p>'+V.map(v=>{const d=cdist(v);return`<div class="act"><div>${v.e} <b>${v.id==='home'?HOMES[S.home][0]:v.name}</b><br><small>${isOpen(v)||v.id==='home'?'🟢 Open':'🔴 Closed'} ${v.o}:00–${v.cl%24}:00 · ${Math.round(d/2)+5} min ride</small></div><span><button class="btn alt" onclick="walkTo('${v.id}')">Walk</button> <button class="btn" onclick="ride('${v.id}')">${fmt(fare(v))}</button></span></div>`}).join(''))}
+function ride(id){const v=VB[id],f=fare(v),m=Math.round((cdist(v))/2)+5;if(S.money<f)return toast('Not enough for fare.');leaveScene();S.money-=f;advance(m);P.x=v.dx;P.y=v.dy;P.path=[];closePanel();enterVenue(v)}
+function walkTo(id){leaveScene();const v=VB[id];const p=path(P.x,P.y,v.dx,v.dy);closePanel();if(p&&p.length){P.path=p;P.goal=id}else if(p)enterVenue(v)}
+function goHome(){walkTo('home')}
+function openBank(){panel(`<h2>🏦 Gold Coast Bank</h2><div class="kv"><span>Cash</span><b>${fmt(S.money)}</b></div><div class="kv"><span>Savings (1%/week)</span><b>${fmt(S.bank)}</b></div><div class="kv"><span>Loan owed</span><b>${fmt(S.loan)}</b></div>
+<input id="amt" type="number" placeholder="Amount" min="1"><button class="btn" onclick="bank(1)">Deposit</button> <button class="btn alt" onclick="bank(-1)">Withdraw</button> <button class="btn gold" onclick="bank(0)">Repay loan</button> <button class="btn red" onclick="bank(2)">Borrow GH₵2,000</button>`)}
+function bank(k){const a=Math.max(0,+(($('amt')&&$('amt').value)||0));if(k===1&&a&&a<=S.money){S.money-=a;S.bank+=a}else if(k===-1&&a&&a<=S.bank){S.bank-=a;S.money+=a}else if(k===0&&S.loan>0){const p=Math.min(a||S.loan,S.loan,Math.max(0,S.money));S.loan-=p;S.money-=p}else if(k===2){if(S.loan>4000)return toast('Loan limit reached.');S.loan+=2200;S.money+=2000;toast('Borrowed GH₵2,000 (repay GH₵2,200 at GH₵250/week)')}else return toast('Invalid amount.');openBank()}
+function openHomes(){panel('<h2>🏘️ Homes</h2><p><small>Rent is charged every Saturday 09:00. Moving in costs 3 weeks\' rent (2 weeks advance + 1 week agent fee). Fall 2 weeks behind and you are evicted to Nima.</small></p>'+HOMES.map((h,i)=>`<div class="act"><div><b>${h[0]}</b> ${i===S.home?'✅':''}<br><small>${fmt(h[1])}/week · sleep quality ${Math.round(h[2]*100)}%</small></div><button class="btn" ${i===S.home||(i===5&&!S.enrolled)?'disabled':''} onclick="moveHome(${i})">Move (${fmt(h[1]*3)})</button></div>`).join(''))}
+function moveHome(i){const c=HOMES[i][1]*3;if(S.money<c)return toast('Not enough for the advance.');S.money-=c;S.home=i;reenterHome();S.dadPays=S.rich&&i===3;log(`🏠 Moved into ${HOMES[i][0]}.`);toast(`🏠 Welcome to ${HOMES[i][0]}!`);if(i===4)ach('mansion','Trasacco mansion');openHomes()}
+function openShop(){panel('<h2>🛒 Furniture & gadgets</h2>'+SHOP.map(s=>`<div class="act"><div>${s[1]}</div><button class="btn" ${S.items.includes(s[0])?'disabled':''} onclick="buyItem('${s[0]}',${s[2]})">${S.items.includes(s[0])?'Owned':fmt(s[2])}</button></div>`).join(''))}
+function buyItem(id,c){if(S.money<c)return toast('Not enough money.');S.money-=c;S.items.push(id);placeBought(id);toast('Bought! Delivered to your home.');openShop()}
+function openFood(){const f=[['Waakye',25],['Fried rice & chicken',60],['Kenkey & fish',22],['Jollof',45]];panel('<h2>🛵 ChopNow delivery</h2><p><small>Delivered wherever you are (30 min).</small></p>'+f.map(x=>`<div class="act"><div>${x[0]}</div><button class="btn" onclick="order(${x[1]})">${fmt(x[1])}</button></div>`).join(''))}
+function order(c){if(S.money<c)return toast('Not enough money.');S.money-=c;advance(30,{h:55});goal('eat');toast('🛵 Food delivered. Chop well!');closePanel()}
+function openContacts(){const k=NPC.filter(n=>n.st!=='stranger');panel('<h2>👥 Contacts</h2>'+(k.length?k.map(npcRow).join(''):'<p>No contacts yet. Go and meet people!</p>')+`<div class="act"><div>👨🏿‍👩🏿‍👦 Family</div><button class="btn" onclick="callFam()">Call (GH₵2)</button></div>`)}
+function callFam(){S.money-=2;advance(20,{s:25});toast('Maame: "Have you eaten? When are you marrying?"');if(S.rich&&Math.random()<.5){S.money+=500;toast('Daddy sent you GH₵500 💸')}}
+function openGist(){panel(`<h2>💬 Gist — Accra city chat</h2><div class="chat" id="gc">${S.gist.slice(-60).map(g=>`<p><small>${g[2]}</small> <b>${g[0]}:</b> ${g[1]}</p>`).join('')}</div><input id="gm" placeholder="Say something to the city…" onkeydown="if(event.key==='Enter')postGist()"><button class="btn" onclick="postGist()">Post</button><p><small>Simulated city chat (single-player).</small></p>`);const c=$('gc');if(c)c.scrollTop=1e5}
+function postGist(){const v=(($('gm')&&$('gm').value)||'').trim();if(!v)return;S.gist.push(['You',v.replace(/</g,'&lt;'),hhmm(S.t)]);S.gist.push([pick(GISTN),pick(['😂😂','True!','Chale you no lie','Where you dey?','I dey come','God dey','Eiii']),hhmm(S.t)]);S.needs.s=cl(S.needs.s+4);openGist()}
+function netWorth(){return S.money+S.bank-S.loan+S.items.reduce((a,i)=>a+((SHOP.find(s=>s[0]===i)||[0,0,0])[2])*.5,0)}
+function openSim(){panel(`<h2>🧍 ${S.name}</h2><small>${S.gender} · Age ${S.age} · Generation ${S.gen} · ${S.rich?'Big Man Pikin':'Hustle Pikin'} · Traits: ${S.traits.map(t=>TRAITS[t][0]).join(', ')}<br>Dream: ${DREAMS[S.dream][0]} — ${DREAMS[S.dream][1]}</small>
+ <div class="kv"><span>❤️ Health</span><b>${Math.round(S.health)}</b></div><div class="kv"><span>😊 Mood</span><b>${Math.round(mood())}</b></div><div class="kv"><span>🏠 Home</span><b>${HOMES[S.home][0]}</b></div><div class="kv"><span>🎓 Education</span><b>${S.degree?'Degree (UG)':(S.enrolled?'Studying UG · ':'')+S.credits+'/24 credits'}</b></div><div class="kv"><span>💍 Spouse / kids</span><b>${S.spouse||'—'} / ${S.kids}</b></div><div class="kv"><span>💰 Net worth</span><b>${fmt(netWorth())}</b></div><div class="kv"><span>📊 Shifts / earned</span><b>${S.stats.shifts} / ${fmt(S.stats.earned)}</b></div>
+ <h3>Skills</h3>${Object.keys(SKILLS).map(k=>`<div class="kv"><span>${SKILLS[k]}</span><span>${'★'.repeat(sl(k))}${'☆'.repeat(10-sl(k))} ${S.skills[k].toFixed(1)}</span></div>`).join('')}
+ <h3>Needs</h3>${NEEDS.map(n=>`<div class="kv"><span>${n[1]} ${n[2]}</span><b>${Math.round(S.needs[n[0]])}</b></div>`).join('')}`)}
+const GOALS=[['eat','Eat something',50],['job','Get a job',100],['shift','Finish your first shift',150],['skill2','Reach level 2 in any skill',300],['friend','Make a friend',200],['rent','Pay rent on time',200],['beach','Visit Labadi Beach',100],['enrol','Enrol at University of Ghana',200]];
+function goal(id){if(S.goals[id])return;const g=GOALS.find(x=>x[0]===id);if(!g)return;S.goals[id]=1;S.money+=g[2];toast(`🎯 Goal done: ${g[1]} (+${fmt(g[2])})`);log(`🎯 Goal: ${g[1]} +${fmt(g[2])}`)}
+function openGoals(){panel('<h2>🎯 Starter goals</h2>'+GOALS.map(g=>`<div class="kv"><span>${S.goals[g[0]]?'✅':'⬜'} ${g[1]}</span><b>${fmt(g[2])}</b></div>`).join('')+`<h3>Lifetime dream</h3><p>${DREAMS[S.dream][0]}: ${DREAMS[S.dream][1]} ${S.ach.dream?'✅':''}</p>`)}
+function ach(id,name){if(S.ach[id])return;S.ach[id]=name;toast(`🏆 Achievement: ${name}`);log(`🏆 ${name}`);beep(880)}
+function dreamDone(){if(S.ach.dream)return;S.money+=20000;ach('dream','Lifetime dream achieved');toast('🌟 LIFETIME DREAM ACHIEVED +GH₵20,000')}
+function openAch(){const all=Object.values(S.ach);panel('<h2>🏆 Achievements</h2>'+(all.length?all.map(a=>`<div class="kv"><span>🏆 ${a}</span></div>`).join(''):'<p>None yet.</p>')+'<p><small>Hidden ones include promotions, marriage, graduation, Black Stars, dumsor, wealth, mansion, eviction, unicorn and ageing…</small></p>')}
+function openLog(){panel('<h2>📰 Diary</h2>'+S.log.slice(0,80).map(l=>`<p style="margin:4px 0;font-size:13px">${l}</p>`).join(''))}
+function openSettings(){panel(`<h2>⚙️ Settings</h2><button class="btn" onclick="save();toast('Saved ✅')">💾 Save now</button> <button class="btn alt" onclick="soundOn=!soundOn;toast('Sound '+(soundOn?'on':'off'))">🔊 Toggle sound</button>
+<h3>Export / import save</h3><textarea id="sv" rows="3" placeholder="Paste a save code here"></textarea><button class="btn alt" onclick="exportSave()">Export</button> <button class="btn alt" onclick="importSave()">Import</button>
+<h3>Danger zone</h3><button class="btn red" onclick="if(confirm('Start a brand new life? This deletes your save.')){localStorage.removeItem('ghanaLife2');location.reload()}">New life</button>
+<p><small>Keys: arrows/WASD walk · M map · P phone · I sim · T things · E people · H home · Space pause · Esc close. Autosaves every 10s.</small></p>`)}
+function exportSave(){save();$('sv').value=btoa(unescape(encodeURIComponent(JSON.stringify(S))))}
+function importSave(){try{S=JSON.parse(decodeURIComponent(escape(atob($('sv').value.trim()))));NPC=(S.npcs||mkNPCs()).map(n=>Object.assign({},n,{path:[],chat:n.chat||[]}));S.scene=null;S.build=false;IN=null;P.x=S.px||VB.home.dx;P.y=S.py||VB.home.dy;updBar();toast('Imported ✅');closePanel()}catch(e){toast('Invalid save code')}}
+// ================= VENUES =================
+function thingsHere(){const v=curV();if(!v)return panel(`<h2>✨ Out on the street</h2><p>Tap a building (or walk onto its door) to go inside. Or open 🗺️ Map to take a trotro.</p><p><small>${hhmm(S.t)} ${DOW[dow()]} — ${NPC.filter(near).length} people nearby.</small></p>`);
+ const isHome=v.id==='home',name=isHome?HOMES[S.home][0]:v.name,open=isHome||isOpen(v);let job='';
+ if(S.job&&CB[S.job.id].v===v.id){const c=CB[S.job.id];job=`<div class="act" style="border:1px solid var(--y)"><div>💼 Your workplace — ${c.t[S.job.lvl]}<br><small>Shift ${c.st}:00–${c.st+4}:00 ${workday(c,day())?'today':'(day off)'} · performance ${Math.round(S.job.perf)}%</small></div><button class="btn gold" onclick="closePanel();clockIn()">Clock in</button></div>`}
+ const people=NPC.filter(n=>Math.hypot(n.x-v.dx,n.y-v.dy)<3.5);
+ panel(`<h2>${v.e} ${name}</h2><small>${open?'🟢 Open':'🔴 Closed'} · ${v.o}:00–${v.cl%24}:00 · ${hhmm(S.t)} ${DOW[dow()]}${!S.power&&isHome?' · ⚡ DUMSOR':''}</small>${job}
+ ${ACTS[v.id].map((a,i)=>{const lock=(a.item&&!S.items.includes(a.item))||(a.req&&sl(a.req[0])<a.req[1]);return`<div class="act"><div>${a.l}<br><small>${a.m>1?(a.m>=60?a.m/60+'h':a.m+'m'):''} ${a.c?'· '+fmt(a.c):''} ${Object.entries(a.d).map(([k,x])=>NEEDS.find(n=>n[0]===k)[1]+(x>0?'+':'')+x).join(' ')} ${a.sk?'· '+SKILLS[a.sk]:''}${a.item&&!S.items.includes(a.item)?' · needs '+a.item:''}</small></div><button class="btn ${lock?'alt':''}" onclick="doFromList('${v.id}',${i})">Do</button></div>`}).join('')}
+ ${people.length?'<h3>People here</h3>'+people.map(npcRow).join(''):''}`)}
+// ================= DEATH / LEGACY =================
+function die(){if(S.dead)return;S.dead=true;save();panel(`<h2>🕊️ Rest in peace, ${S.name}</h2><p>Died at age ${S.age}. Net worth ${fmt(netWorth())}. ${S.job?'Career: '+CB[S.job.id].t[S.job.lvl]+'.':''} Achievements: ${Object.keys(S.ach).length}.</p><p>The funeral was a grand Saturday affair in red and black. Damirifa due. 🖤</p>
+ ${S.kids?`<button class="btn gold" onclick="legacy()">Continue as your child (inherit 80%)</button>`:''} <button class="btn red" onclick="localStorage.removeItem('ghanaLife2');location.reload()">New life</button>`)}
+function legacy(){const inh=Math.max(0,netWorth()*.8),o=S;S=newState({name:pick(o.gender==='Male'?FIRST_M:FIRST_F)+' '+o.name.split(' ').pop(),gender:o.gender,traits:o.traits,dream:o.dream,rich:false,gen:o.gen+1,money:Math.round(inh)});S.loan=0;S.log.unshift(`👪 Generation ${S.gen}: inherited ${fmt(inh)}.`);S.scene=null;IN=null;NPC=mkNPCs();P.x=VB.home.dx;P.y=VB.home.dy;closePanel();save()}
+// ================= START SCREEN =================
+function startScreen(){const st=$('start');st.style.display='block';const tr=Object.entries(TRAITS).map(([k,t])=>`<label><input type="checkbox" name="tr" value="${k}" style="width:auto"> ${t[0]} <small>${t[1]}</small></label>`).join('');
+ st.innerHTML=`<div class="box"><h1 style="margin:6px 0">🇬🇭 Ghana Life</h1><div class="flag"></div><p>A real-time city life sim in Accra. Work shifts, pay rent every Saturday, study at Legon, find love — and grow old year by year.</p>
+ <label>Name<input id="nm" value="${pick(FIRST_M.concat(FIRST_F))} ${pick(LAST)}"></label><label>Gender<select id="gd"><option>Male</option><option>Female</option></select></label>
+ <b>Pick 2 traits</b><div class="chips">${tr}</div>
+ <label>Lifetime dream<select id="dr">${Object.entries(DREAMS).map(([k,d])=>`<option value="${k}">${d[0]} — ${d[1]}</option>`).join('')}</select></label>
+ <div class="chips"><label><input type="checkbox" id="stu" style="width:auto"> Start as a University of Ghana fresher (hall room, enrolled)</label></div>
+ <p><small>🎲 Your background is decided by the <b>birth lottery</b>: 1 in 4 are born in East Legon with Daddy's money; the rest start in Nima with a susu loan.</small></p>
+ <button class="btn gold" style="width:100%;font-size:18px" onclick="begin()">🎲 Spin the birth lottery</button></div>`}
+function begin(){const tr=[...document.querySelectorAll('input[name=tr]:checked')].map(x=>x.value).slice(0,2);while(tr.length<2){const k=pick(Object.keys(TRAITS));if(!tr.includes(k))tr.push(k)}
+ const rich=Math.random()<.25;S=newState({name:($('nm').value||'Kwame Mensah').slice(0,30).replace(/</g,''),gender:$('gd').value||'Male',traits:tr,dream:DREAMS[$('dr').value]?$('dr').value:'oga',rich,student:$('stu').checked});
+ S.scene=null;IN=null;NPC=mkNPCs();P.x=VB.home.dx;P.y=VB.home.dy;$('start').style.display='none';updBar();save();
+ panel(`<h2>🎲 Birth lottery result</h2><h3>${rich?'💎 Big Man Pikin!':'💪 Hustle Pikin'}</h3><p>${rich?'Born into money in East Legon. Daddy pays the rent and you have a car, laptop, TV, AC and GH₵20,000.':'Born in Nima. GH₵800 cash plus a GH₵2,000 susu loan (GH₵250 repaid each Saturday). Home is a compound room — hustle up!'}</p><p>👉 Open 📱 Phone → Jobs to get hired. Keep the six bars green. Rent is due every Saturday 09:00. 1 game month = 1 year of life.</p>`)}
+// ================= INTERIORS (Sims-style) =================
+const FURN={
+ bed:{n:'Bed',w:2,h:2,c:'#5c6bc0',p:400,e:'🛏️'},sofa:{n:'Sofa',w:2,h:1,c:'#8d6e63',p:500,e:'🛋️'},tv:{n:'Flat TV',w:1,h:1,c:'#263238',p:1200,e:'📺',item:'tv'},
+ stove:{n:'Gas stove',w:1,h:1,c:'#9e9e9e',p:350,e:'🍳'},fridge:{n:'Fridge',w:1,h:1,c:'#eceff1',p:600,e:'🧊'},shower:{n:'Shower',w:1,h:1,c:'#81d4fa',p:300,e:'🚿'},
+ toilet:{n:'Toilet',w:1,h:1,c:'#fafafa',p:250,e:'🚽'},mirror:{n:'Mirror',w:1,h:1,c:'#b0bec5',p:150,e:'🪞'},books:{n:'Bookshelf',w:1,h:1,c:'#6d4c41',p:300,e:'📚',item:'books'},
+ laptop:{n:'Desk + laptop',w:2,h:1,c:'#795548',p:2500,e:'💻',item:'laptop'},guitar:{n:'Guitar stand',w:1,h:1,c:'#a1887f',p:600,e:'🎸',item:'guitar'},
+ mat:{n:'Exercise mat',w:1,h:1,c:'#26a69a',p:120,e:'🧘'},table:{n:'Dining table',w:2,h:1,c:'#a1887f',p:300,e:'🍽️'},ac:{n:'Air conditioner',w:1,h:1,c:'#e0f7fa',p:3000,e:'❄️',item:'ac'},
+ gen:{n:'Generator',w:1,h:1,c:'#ffb300',p:3500,e:'🔌',item:'gen'},plant:{n:'Potted plant',w:1,h:1,c:'#2e7d32',p:80,e:'🪴'},kente:{n:'Kente wall art',w:1,h:1,c:'#fbc02d',p:200,e:'🎨'}};
+// which home furniture offers which home activity
+[['bed'],['bed','sofa'],['stove'],['fridge'],['shower'],['toilet'],['tv'],['mirror'],['books'],['mat'],['laptop'],['laptop'],['guitar'],['table','laptop'],['sofa','bed']].forEach((o,i)=>ACTS.home[i].o=o);
+const ROLE={bed:['bed','main'],shower:['bath'],toilet:['bath'],mirror:['bath'],stove:['kitchen'],fridge:['kitchen'],table:['kitchen','living','main']};
+let IN=null,TS=40;const IO={x:0,y:0},B={hold:null,orig:null},PIE=[];let clockMs=0;
+const ow=o=>o.r?o.h:o.w,oh=o=>o.r?o.w:o.h,cpx=()=>S&&S.scene?P.cx:P.x,cpy=()=>S&&S.scene?P.cy:P.y,cdist=v=>Math.abs(v.dx-cpx())+Math.abs(v.dy-cpy());
+function mkGrid(w,h){const g=[];for(let y=0;y<h;y++){g.push([]);for(let x=0;x<w;x++)g[y].push(x===0||y===0||x===w-1||y===h-1?1:2)}return g}
+function fillRoom(L,x0,y0,x1,y1,k,name,role){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)L.g[y][x]=k;L.rooms.push({x0,y0,x1,y1,name,role})}
+const kk=(L,x,y)=>y*L.w+x;
+function door(L,x,y,k){L.g[y][x]=k||2;L.doors.add(kk(L,x,y))}
+function layoutHome(tier){const [w,h]=[[9,8],[11,9],[13,10],[15,11],[18,13],[9,8]][tier]||[9,8];const L={w,h,g:mkGrid(w,h),rooms:[],doors:new Set(),objs:[],npcs:[],vid:'home'};let vx;
+ if(tier>=2&&tier<=4){vx=Math.floor(w*.55);const hy=Math.floor(h*.45);
+  fillRoom(L,1,1,vx-1,hy-1,4,'Bedroom','bed');fillRoom(L,vx+1,1,w-2,hy-1,3,'Bathroom','bath');fillRoom(L,1,hy+1,vx-1,h-2,2,'Living room','living');fillRoom(L,vx+1,hy+1,w-2,h-2,3,'Kitchen','kitchen');
+  for(let y=0;y<h;y++)L.g[y][vx]=1;for(let x=0;x<w;x++)L.g[hy][x]=1;
+  door(L,vx,Math.floor(hy/2),3);door(L,vx,hy+Math.floor((h-hy)/2),3);door(L,Math.floor(vx/2),hy,2);door(L,vx+Math.floor((w-vx)/2),hy,3)}
+ else{vx=w-5;const hy=Math.floor(h/2);
+  fillRoom(L,1,1,vx-1,h-2,tier===5?4:2,tier===5?'Hall room':'Room','main');fillRoom(L,vx+1,1,w-2,hy-1,3,'Bathroom','bath');fillRoom(L,vx+1,hy+1,w-2,h-2,3,'Kitchen corner','kitchen');
+  for(let y=0;y<h;y++)L.g[y][vx]=1;for(let x=vx;x<w;x++)L.g[hy][x]=1;door(L,vx,Math.floor(hy/2),3);door(L,vx,hy+Math.floor((h-hy)/2),3)}
+ L.ex=Math.max(2,Math.floor(vx/2));L.ey=h-1;L.g[h-1][L.ex]=9;L.doors.add(kk(L,L.ex,h-2));return L}
+const isFloor=(L,x,y)=>x>0&&y>0&&x<L.w-1&&y<L.h-1&&L.g[y][x]>=2&&L.g[y][x]<9;
+function occAt(L,x,y,skip){return L.objs.find(o=>o!==skip&&x>=o.x&&x<o.x+ow(o)&&y>=o.y&&y<o.y+oh(o))}
+const walkIn=(x,y)=>IN&&x>=0&&y>=0&&x<IN.w&&y<IN.h&&IN.g[y][x]>=2&&!occAt(IN,x,y);
+function canPlace(L,o){for(let y=o.y;y<o.y+oh(o);y++)for(let x=o.x;x<o.x+ow(o);x++){if(!isFloor(L,x,y)||L.doors.has(kk(L,x,y))||occAt(L,x,y,o))return false}
+ const had=L.objs.includes(o);if(!had)L.objs.push(o);
+ const wk=(x,y)=>x>=0&&y>=0&&x<L.w&&y<L.h&&L.g[y][x]>=2&&!occAt(L,x,y);let free=0;for(let y=0;y<L.h;y++)for(let x=0;x<L.w;x++)if(wk(x,y))free++;
+ const seen=new Set([kk(L,L.ex,L.ey)]),q=[[L.ex,L.ey]];let qi=0;while(qi<q.length){const [x,y]=q[qi++];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(wk(nx,ny)&&!seen.has(kk(L,nx,ny))){seen.add(kk(L,nx,ny));q.push([nx,ny])}}}
+ let ok=seen.size===free&&L.objs.every(b=>adjTiles(b).some(([x,y])=>seen.has(kk(L,x,y))));if(!had)L.objs.pop();return ok}
+function adjTiles(o){const r=[];for(let x=o.x;x<o.x+ow(o);x++){r.push([x,o.y-1],[x,o.y+oh(o)])}for(let y=o.y;y<o.y+oh(o);y++){r.push([o.x-1,y],[o.x+ow(o),y])}return r}
+const isAdj=(o,x,y)=>adjTiles(o).some(t=>t[0]===x&&t[1]===y);
+function autoPlace(L,t){const f=FURN[t];const o={t,w:f.w,h:f.h,r:0,x:0,y:0};const pref=ROLE[t]||['living','main','bed','kitchen'];
+ const rooms=[...L.rooms].sort((a,b)=>{const ia=pref.indexOf(a.role),ib=pref.indexOf(b.role);return(ia<0?9:ia)-(ib<0?9:ib)}).filter(r=>pref.includes(r.role)||(r.role!=='bath'&&!ROLE[t]));
+ for(const rm of rooms){const c=[];for(const r of [0,1])for(let y=rm.y0;y<=rm.y1;y++)for(let x=rm.x0;x<=rm.x1;x++){o.r=r;if(x+ow(o)-1>rm.x1||y+oh(o)-1>rm.y1)continue;c.push([x,y,r,Math.min(x-rm.x0,rm.x1-(x+ow(o)-1),y-rm.y0,rm.y1-(y+oh(o)-1))])}
+  c.sort((a,b)=>a[3]-b[3]||a[1]-b[1]);for(const [x,y,r] of c){o.x=x;o.y=y;o.r=r;if(canPlace(L,o)){L.objs.push(o);return true}}}return false}
+function ensureFurn(L){if(!S.furn||S.furn.tier!==S.home){const prev=S.furn?S.furn.list.map(o=>o.t):[];S.furn={tier:S.home,list:[]};L.objs=S.furn.list;const t=S.home;
+  const want=['bed','shower','toilet','stove','fridge','mirror'];if(t>=1&&t!==5)want.push('sofa');if(t>=2&&t<=4)want.push('table','plant','mat');if(t>=3&&t<=4)want.push('plant','kente');
+  for(const it of S.items)if(FURN[it]&&!want.includes(it))want.push(it);for(const p of prev){if(prev.filter(x=>x===p).length>want.filter(x=>x===p).length)want.push(p)}
+  for(const w of want)autoPlace(L,w)}L.objs=S.furn.list;L.objs.forEach(o=>{const f=FURN[o.t];if(f){o.w=f.w;o.h=f.h}})}
+function layoutVenue(v){const acts=ACTS[v.id].map((a,i)=>({a,i})),wc=acts.filter(x=>/washroom|toilet/i.test(x.a.l)),main=acts.filter(x=>!wc.includes(x)),jobs=C.some(c=>c.v===v.id);
+ const w=Math.max(12,Math.min(18,(main.length+(jobs?1:0))*2+6)),h=11,L={w,h,g:mkGrid(w,h),rooms:[],doors:new Set(),objs:[],npcs:[],vid:v.id};
+ const fk=v.id==='beach'?7:v.id==='stadium'?8:5;fillRoom(L,1,1,w-2,h-2,fk,v.name,'hall');L.ex=w>>1;L.ey=h-1;L.g[h-1][L.ex]=9;L.doors.add(kk(L,L.ex,h-2));
+ let right=w-2;if(wc.length){const wx=w-6;for(let y=0;y<=4;y++)L.g[y][wx]=1;for(let x=wx;x<w;x++)L.g[4][x]=1;fillRoom(L,wx+1,1,w-2,3,3,'Washroom','bath');door(L,w-4,4,3);right=wx-1;
+  wc.forEach((x,j)=>{const o={t:'act',ai:x.i,w:1,h:1,r:0,x:w-2-j,y:1};if(canPlace(L,o))L.objs.push(o)})}
+ const slots=[];for(let x=2;x<right;x+=2)slots.push([x,1]);for(let y=3;y<h-2;y+=2){slots.push([1,y]);slots.push([w-2,y])}
+ const list=[...(jobs?[{t:'work',w:2,h:1,r:0}]:[]),...main.map(x=>({t:'act',ai:x.i,w:1,h:1,r:0}))];
+ for(const o of list){for(const s of slots){o.x=s[0];o.y=s[1];if(canPlace(L,o)){L.objs.push(o);break}}}
+ const dec={ug:'bench',school:'bench',church:'bench',mosque:'rug',chop:'rtable',bar:'rtable',hotel:'rtable',mall:'rtable',kenkey:'rtable',office:'desk',bank:'desk',tech:'desk',hospital:'dbed',gym:'mat2',market:'stall',station:'bench',studio:'rug',salon:'chair',police:'desk',estate:'desk',beach:'umbrella',stadium:'goal',workshop:'car'}[v.id];
+ if(dec){let n=0;for(let y=4;y<h-3&&n<6;y+=2)for(let x=3;x<w-4&&n<6;x+=3){const o={t:'decor',d:dec,w:dec==='bench'||dec==='desk'||dec==='stall'||dec==='car'?2:1,h:1,r:0,x,y};if(canPlace(L,o)){L.objs.push(o);n++}}}
+ return L}
+function interiorFor(vid){const L=vid==='home'?layoutHome(S.home):layoutVenue(VB[vid]);if(vid==='home')ensureFurn(L);
+ const idx=[];if(vid==='home'){const sp=NPC.findIndex(n=>n.st==='spouse');if(sp>=0)idx.push(sp)}else{NPC.forEach((n,i)=>{if(Math.hypot(n.x-VB[vid].dx,n.y-VB[vid].dy)<4)idx.push(i)});
+  while(idx.length<2){const i=R(0,NPC.length-1);if(!idx.includes(i)){idx.push(i);const n=NPC[i];n.x=VB[vid].dx;n.y=VB[vid].dy;n.path=[];n.wait=R(300,900)}}}
+ for(const i of idx.slice(0,4)){for(let t=0;t<60;t++){const x=R(1,L.w-2),y=R(2,L.h-3);if(isFloor(L,x,y)&&!occAt(L,x,y)&&!L.doors.has(kk(L,x,y))&&!L.npcs.some(n=>n.x===x&&n.y===y)){L.npcs.push({i,x,y});break}}}
+ return L}
+function enterVenue(v){P.goal=null;if(v.id!=='home'&&!isOpen(v)){toast(`🔒 ${v.name} is closed (${v.o}:00–${v.cl%24}:00).`);return}
+ P.cx=v.dx;P.cy=v.dy;S.scene=v.id;IN=interiorFor(v.id);P.x=IN.ex;P.y=IN.ey-1;P.path=[];P.useObj=null;closePanel();updBar();toast(`${v.e} ${v.id==='home'?HOMES[S.home][0]:v.name} — tap objects to use them`)}
+function leaveScene(){if(!S||!S.scene)return;S.scene=null;S.build=false;IN=null;B.hold=null;P.x=P.cx;P.y=P.cy;P.path=[];P.act=null;P.useObj=null;hidePie();updBar()}
+function reenterHome(){if(S.scene==='home'){IN=interiorFor('home');P.x=IN.ex;P.y=IN.ey-1;P.path=[]}}
+function placeBought(id){if(!FURN[id])return;const L=layoutHome(S.home);ensureFurn(L);if(!autoPlace(L,id))toast('No space at home — place it in 🔨 Build mode later.');if(S.scene==='home')IN.objs=S.furn.list}
+function bfsIn(sx,sy,goal){sx=Math.round(sx);sy=Math.round(sy);const k=(x,y)=>y*IN.w+x,prev=new Map([[k(sx,sy),-1]]),q=[[sx,sy]];let qi=0;
+ while(qi<q.length){const [x,y]=q[qi++];if(goal(x,y)){const p=[];let c=k(x,y);while(c!==-1){p.unshift([c%IN.w,Math.floor(c/IN.w)]);c=prev.get(c)}p.shift();return p}
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(walkIn(nx,ny)&&!prev.has(k(nx,ny))){prev.set(k(nx,ny),k(x,y));q.push([nx,ny])}}}return null}
+function objActs(o){if(!IN)return[];if(IN.vid==='home')return ACTS.home.map((a,i)=>({a,i})).filter(x=>x.a.o&&x.a.o.includes(o.t));if(o.t==='act')return[{a:ACTS[IN.vid][o.ai],i:o.ai}];return[]}
+function objName(o){return FURN[o.t]?FURN[o.t].n:o.t==='work'?'Work station':o.t==='act'?ACTS[IN.vid][o.ai].l.replace(/^\S+\s/,''):({bench:'Bench',rtable:'Table',desk:'Desk',dbed:'Ward bed',mat2:'Mat',stall:'Stall',rug:'Prayer mat',chair:'Salon chair',umbrella:'Umbrella',goal:'Goalpost',car:'Car on jack'}[o.d]||'Decor')}
+function goUse(o,auto){if(isAdj(o,Math.round(P.x),Math.round(P.y))&&!P.path.length){faceTo(o);return auto!=null?runAuto(o,auto):openObj(o)}const p=bfsIn(P.x,P.y,(x,y)=>isAdj(o,x,y));if(p){P.path=p;P.useObj=o;P.autoAct=auto}else toast("Can't reach that.")}
+function faceTo(o){P.face=(o.x+ow(o)/2)<P.x?-1:1}
+function runAuto(o,a){if(a==='shift')return startShiftTimed();startTimed(IN.vid,a)}
+function openObj(o){const items=objActs(o).map(x=>({l:x.a.l,f:()=>startTimed(IN.vid,x.i)}));
+ if(o.t==='work'){if(S.job&&CB[S.job.id].v===IN.vid)items.push({l:'⏱️ Clock in for shift',f:startShiftTimed});else items.push({l:'💼 Ask about jobs here',f:openJobs})}
+ if(!items.length)items.push({l:'👀 Admire the '+objName(o).toLowerCase(),f:()=>{S.needs.f=cl(S.needs.f+1);toast('Very nice.')}});showPie(o,items)}
+function showPie(o,items){PIE.length=0;items.forEach(x=>PIE.push(x.f));const cx=IO.x+(o.x+ow(o)/2)*TS,cy=IO.y+(o.y+oh(o)/2)*TS,n=items.length,r=n<=2?70:n<=4?95:115;
+ $('pie').innerHTML=`<button class="x" style="left:${cx}px;top:${cy}px" onclick="hidePie()">✖</button>`+items.map((x,i)=>{const ang=-Math.PI/2+(n===1?0:(i-(n-1)/2)*(Math.PI*1.6/Math.max(1,n-1))*(n>2?1:.6));const px=Math.max(80,Math.min(VW-80,cx+Math.cos(ang)*r)),py=Math.max(60,Math.min(VH-140,cy+Math.sin(ang)*r));return`<button style="left:${px}px;top:${py}px" onclick="pieGo(${i})">${x.l}</button>`}).join('');$('pie').style.display='block'}
+function pieGo(i){const f=PIE[i];hidePie();if(f)f()}
+function hidePie(){const p=$('pie');if(p){p.style.display='none';p.innerHTML=''}}
+function startTimed(vid,i){hidePie();const a=ACTS[vid][i];if(P.act)return toast('Busy! Tap the map to stop.');if(a.app||a.enrol||a.pitch)return doAct(vid,i);const err=actErr(vid,a);if(err)return toast(err);
+ S.money-=a.c;S.stats.spent+=a.c;P.act={l:a.l,e:a.l.split(' ')[0],mins:a.m,d:actDeltas(vid,a),done:0,t:0,dur:Math.min(5,1+a.m/120),onDone:()=>actFinish(vid,a)}}
+function startShiftTimed(){hidePie();const e=shiftErr(false);if(e)return toast(e);const m=mood();P.act={l:'Working shift',e:'💼',mins:240,d:{f:-10,s:5},done:0,t:0,dur:4,onDone:()=>shiftDone(m)}}
+function clockIn(){if(!S.job)return toast('No job yet.');const c=CB[S.job.id];if(S.scene===c.v&&IN){const o=IN.objs.find(o=>o.t==='work');if(o)return goUse(o,'shift')}doShift()}
+function doFromList(vid,i){closePanel();if(S.scene===vid&&IN){const a=ACTS[vid][i];if(!a.app&&!a.enrol&&!a.pitch){const o=IN.objs.find(o=>vid==='home'?(a.o||[]).includes(o.t):o.t==='act'&&o.ai===i);if(o)return goUse(o,i);return startTimed(vid,i)}}doAct(vid,i)}
+function walkToTileIn(tx,ty){if(!IN)return;let p=bfsIn(P.x,P.y,(x,y)=>x===tx&&y===ty);if(!p){let best=null,bd=1e9;for(let y=0;y<IN.h;y++)for(let x=0;x<IN.w;x++){if(!walkIn(x,y))continue;const d=Math.abs(x-tx)+Math.abs(y-ty);if(d<bd){bd=d;best=[x,y]}}if(best&&bd<=3)p=bfsIn(P.x,P.y,(x,y)=>x===best[0]&&y===best[1])}if(p){P.path=p;P.useObj=null;P.autoAct=null}}
+function exitWalk(){if(!IN)return;const p=bfsIn(P.x,P.y,(x,y)=>x===IN.ex&&y===IN.ey);if(p&&p.length){P.path=p;P.useObj=null}else leaveScene()}
+// ---- build / buy mode ----
+function toggleBuild(){if(S.scene!=='home')return toast('Build mode works inside your home.');S.build=!S.build;if(!S.build)cancelHold();hidePie();updBar();if(S.build)toast('🔨 Build mode: tap furniture to pick it up, or open the catalogue.')}
+function buildTap(tx,ty){if(B.hold){B.hold.x=tx;B.hold.y=ty;return placeHold()}const o=occAt(IN,tx,ty);if(o){IN.objs.splice(IN.objs.indexOf(o),1);B.hold=o;B.orig={x:o.x,y:o.y,r:o.r};toast(`Holding ${FURN[o.t].n}: tap a spot · Rotate · Sell`)}}
+function placeHold(){const o=B.hold;if(!o)return;const px=Math.round(P.x),py=Math.round(P.y);if(px>=o.x&&px<o.x+ow(o)&&py>=o.y&&py<o.y+oh(o))return toast('Your Sim is standing there.');
+ if(!canPlace(IN,o))return toast('❌ Can\'t place there (wall, overlap, or it would block a path).');
+ if(o.isNew){const f=FURN[o.t];if(S.money<f.p)return toast('Not enough money.');S.money-=f.p;delete o.isNew;if(f.item&&!S.items.includes(f.item))S.items.push(f.item);toast(`Bought ${f.n} 🛒`)}
+ IN.objs.push(o);B.hold=null;B.orig=null;beep(700);save()}
+function cancelHold(){if(!B.hold)return;if(!B.hold.isNew){Object.assign(B.hold,B.orig);IN.objs.push(B.hold)}B.hold=null}
+function rotateHold(){if(B.hold)B.hold.r=B.hold.r?0:1;else toast('Pick up furniture first.')}
+function sellHold(){const o=B.hold;if(!o)return toast('Pick up furniture first, then Sell.');if(!o.isNew){const f=FURN[o.t];S.money+=Math.round(f.p*.5);if(f.item&&!IN.objs.some(x=>x.t===o.t))S.items=S.items.filter(i=>i!==f.item);toast(`Sold ${f.n} for ${fmt(f.p*.5)}`)}B.hold=null;save()}
+function openCatalog(){panel('<h2>🛋️ Furniture catalogue</h2><p><small>Buy, then tap a spot in your home to place it. Rotate with R / 🔄.</small></p>'+Object.entries(FURN).map(([k,f])=>`<div class="act"><div>${f.e} <b>${f.n}</b><br><small>${f.w}×${f.h} tiles · ${fmt(f.p)}${f.item?' · unlocks activities':''}</small></div><button class="btn" onclick="buyFurn('${k}')">Buy</button></div>`).join(''))}
+function buyFurn(k){const f=FURN[k];if(S.money<f.p)return toast('Not enough money.');closePanel();cancelHold();B.hold={t:k,w:f.w,h:f.h,r:0,x:Math.max(1,Math.round(P.x)-1),y:Math.max(1,Math.round(P.y)-2),isNew:true};toast('Tap where to place it (R rotates)')}
+function updBar(){const b=$('bar');if(!b)return;let h;
+ if(S&&S.scene&&S.build)h=[['🛋️ Catalogue','openCatalog()'],['🔄 Rotate','rotateHold()'],['💰 Sell','sellHold()'],['✖ Cancel','cancelHold()'],['✅ Done','toggleBuild()']];
+ else if(S&&S.scene)h=[['📱 Phone','openPhone()'],['🧍 Sim','openSim()'],['✨ Things','thingsHere()'],['👥 People','peopleHere()']].concat(S.scene==='home'?[['🔨 Build','toggleBuild()']]:[]).concat([['🚪 Exit','exitWalk()']]);
+ else h=[['📱 Phone','openPhone()'],['🗺️ Map','openMapApp()'],['🧍 Sim','openSim()'],['✨ Things','thingsHere()'],['👥 People','peopleHere()'],['🏠 Home','goHome()']];
+ b.innerHTML=h.map(x=>`<button onclick="${x[1]}">${x[0]}</button>`).join('')}
+// ---- drawing ----
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+const SHIRTS=['#e53935','#1e88e5','#43a047','#fb8c00','#8e24aa','#00897b','#f4511e','#3949ab','#c0ca33','#6d4c41','#d81b60','#039be5','#7cb342','#5e35b1'];
+function drawSim(cx,cy,s,o){const k=s/40;ctx.save();ctx.translate(cx,cy);ctx.scale(k*(o.face<0?-1:1),k);
+ ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(0,17,11,4,0,0,7);ctx.fill();
+ const sw=o.walk?Math.sin(o.ph)*5:0,bob=o.walk?Math.abs(Math.sin(o.ph))*-2:(o.act?Math.sin(clockMs/150)*1.5:0);ctx.translate(0,bob);
+ ctx.fillStyle='#1c2833';rr(-7,4,6,12+sw*.4,2);ctx.fill();rr(1,4,6,12-sw*.4,2);ctx.fill();ctx.fillStyle='#111';ctx.fillRect(-8,15+sw*.4,7,3);ctx.fillRect(1,15-sw*.4,7,3);
+ ctx.fillStyle=o.shirt;if(o.g==='f'){ctx.beginPath();ctx.moveTo(-8,-7);ctx.lineTo(8,-7);ctx.lineTo(12,9);ctx.lineTo(-12,9);ctx.closePath();ctx.fill();ctx.fillStyle='#fcd116';ctx.fillRect(-11,4,22,2)}else{rr(-9,-7,18,15,4);ctx.fill()}
+ ctx.fillStyle='#4e2c1e';const as=o.walk?-sw:(o.act?Math.sin(clockMs/120)*4:0);rr(-13,-6+as*.4,5,12,2);ctx.fill();rr(8,-6-as*.4,5,12,2);ctx.fill();
+ ctx.fillStyle='#5d3a26';ctx.beginPath();ctx.arc(0,-15,8.5,0,7);ctx.fill();
+ ctx.fillStyle='#120c08';if(o.g==='f'){ctx.beginPath();ctx.arc(0,-19,8,Math.PI,0);ctx.fill();ctx.beginPath();ctx.arc(0,-26,5,0,7);ctx.fill()}else{ctx.beginPath();ctx.arc(0,-17,8.5,Math.PI*1.05,-0.05);ctx.fill()}
+ ctx.fillStyle='#fff';ctx.fillRect(1,-16,3,3);ctx.fillRect(5,-16,2,3);ctx.fillStyle='#000';ctx.fillRect(2,-15,1.5,1.5);ctx.fillRect(5.5,-15,1.2,1.5);
+ ctx.restore();
+ if(o.gem!=null){const gy=cy-38*k+Math.sin(clockMs/300)*2*k,gx=cx,gs=7*k,col=o.gem>60?'#2ecc40':o.gem>35?'#f1c40f':'#e74c3c';
+  ctx.fillStyle=col;ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx,gy-gs*1.5);ctx.lineTo(gx+gs,gy);ctx.lineTo(gx,gy+gs*1.5);ctx.lineTo(gx-gs,gy);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#000';ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rd=i%2?gs*.22:gs*.5;ctx.lineTo(gx+Math.cos(a)*rd,gy+Math.sin(a)*rd)}ctx.closePath();ctx.fill()}
+ if(o.name){ctx.font=`bold ${Math.max(9,11*k)}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#000a';const tw=ctx.measureText(o.name).width+6;ctx.fillRect(cx-tw/2,cy+20*k,tw,13);ctx.fillStyle='#fff';ctx.fillText(o.name,cx,cy+20*k+7)}}
+const FLOORS={2:['#b07d4f','#9c6b40'],3:['#e3e7ea','#c5ccd1'],4:['#7b5ea7','#6f5398'],5:['#d8cbb0','#cbbd9f'],7:['#ecd59c','#e2c98a'],8:['#43a047','#3d9440']};
+function drawObj(o,ghost){const x=IO.x+o.x*TS,y=IO.y+o.y*TS,w=ow(o)*TS,h=oh(o)*TS,p=TS*.08;ctx.save();if(ghost)ctx.globalAlpha=.65;
+ ctx.fillStyle='rgba(0,0,0,.25)';rr(x+p+3,y+p+4,w-2*p,h-2*p,6);ctx.fill();
+ const t=o.t,f=FURN[t];
+ if(t==='bed'){ctx.fillStyle='#4e342e';rr(x+p,y+p,w-2*p,h-2*p,6);ctx.fill();ctx.fillStyle='#fafafa';rr(x+p*2,y+p*2,w-4*p,h-4*p,5);ctx.fill();
+  ctx.fillStyle='#dfe9f5';if(o.r){rr(x+p*3,y+p*3,w*.22,h-6*p,5);ctx.fill();ctx.fillStyle=f.c;rr(x+w*.4,y+p*2,w*.6-2*p,h-4*p,5);ctx.fill()}else{rr(x+p*3,y+p*3,w-6*p,h*.22,5);ctx.fill();ctx.fillStyle=f.c;rr(x+p*2,y+h*.4,w-4*p,h*.6-2*p,5);ctx.fill()}
+  ctx.fillStyle='#fcd11688';ctx.fillRect(o.r?x+w*.55:x+p*2,o.r?y+p*2:y+h*.6,o.r?4:w-4*p,o.r?h-4*p:4)}
+ else if(t==='sofa'){ctx.fillStyle=f.c;rr(x+p,y+p,w-2*p,h-2*p,8);ctx.fill();ctx.fillStyle='#5d4037';if(o.r)rr(x+p,y+p,w*.3,h-2*p,6);else rr(x+p,y+p,w-2*p,h*.32,6);ctx.fill();ctx.strokeStyle='#5d403788';ctx.beginPath();if(o.r){ctx.moveTo(x+w*.3,y+h/2);ctx.lineTo(x+w-p,y+h/2)}else{ctx.moveTo(x+w/2,y+h*.32);ctx.lineTo(x+w/2,y+h-p)}ctx.stroke()}
+ else if(t==='toilet'){ctx.fillStyle='#fff';rr(x+TS*.25,y+p,TS*.5,TS*.25,3);ctx.fill();ctx.beginPath();ctx.ellipse(x+TS/2,y+TS*.6,TS*.26,TS*.3,0,0,7);ctx.fill();ctx.strokeStyle='#90a4ae';ctx.stroke();ctx.fillStyle='#b3e5fc';ctx.beginPath();ctx.ellipse(x+TS/2,y+TS*.62,TS*.15,TS*.18,0,0,7);ctx.fill()}
+ else if(t==='shower'){ctx.fillStyle='#b3e5fc';rr(x+p,y+p,w-2*p,h-2*p,4);ctx.fill();ctx.strokeStyle='#4fc3f7';ctx.lineWidth=2;ctx.strokeRect(x+p,y+p,w-2*p,h-2*p);ctx.fillStyle='#607d8b';ctx.beginPath();ctx.arc(x+w/2,y+h/2,TS*.08,0,7);ctx.fill()}
+ else if(t==='table'||(t==='decor'&&o.d==='rtable')){ctx.fillStyle='#8d6e63';if(t==='table'){rr(x+p,y+p*2,w-2*p,h-4*p,6);ctx.fill()}else{ctx.beginPath();ctx.arc(x+w/2,y+h/2,TS*.32,0,7);ctx.fill()}ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+w*.3,y+h/2,TS*.1,0,7);ctx.arc(x+w*.7,y+h/2,TS*.1,0,7);ctx.fill()}
+ else if(t==='work'){ctx.fillStyle='#6d4c41';rr(x+p,y+p,w-2*p,h*.6,4);ctx.fill();ctx.fillStyle='#37474f';ctx.beginPath();ctx.arc(x+w/2,y+h*.8,TS*.15,0,7);ctx.fill()}
+ else if(t==='decor'){const d=o.d;ctx.fillStyle={bench:'#795548',desk:'#8d6e63',dbed:'#eceff1',mat2:'#26a69a',stall:'#ff8f00',rug:'#2e7d32',chair:'#e91e63',umbrella:'#ef5350',goal:'#fff',car:'#1565c0'}[d]||'#888';rr(x+p,y+p*2,w-2*p,h-4*p,5);ctx.fill();
+  if(d==='umbrella'){ctx.fillStyle='#fdd835';ctx.beginPath();ctx.arc(x+w/2,y+h/2,TS*.2,0,7);ctx.fill()}if(d==='stall'){ctx.font=TS*.4+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🍅🧅',x+w/2,y+h/2)}if(d==='car'){ctx.font=TS*.6+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🚗',x+w/2,y+h/2)}}
+ else{const col=t==='act'?shade(VB[IN.vid].c,-.15):f?f.c:'#999';ctx.fillStyle=col;rr(x+p,y+p,w-2*p,h-2*p,6);ctx.fill();ctx.fillStyle='rgba(255,255,255,.18)';rr(x+p,y+p,w-2*p,(h-2*p)*.35,6);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1.5;rr(x+p,y+p,w-2*p,h-2*p,6);ctx.stroke()}
+ const em=t==='act'?ACTS[IN.vid][o.ai].l.split(' ')[0]:t==='work'?'💼':f&&!['bed','sofa','table','toilet'].includes(t)?f.e:'';
+ if(em){ctx.font=Math.floor(TS*.55)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(em,x+w/2,y+h/2+1)}
+ ctx.restore()}
+function shade(hex,a){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=a<0?0:255,t=Math.abs(a);r=Math.round((f-r)*t)+r;g=Math.round((f-g)*t)+g;b=Math.round((f-b)*t)+b;return`rgb(${r},${g},${b})`}
+function drawInterior(){const L=IN,w=VW,h=VH;ctx.fillStyle='#0b0f0d';ctx.fillRect(0,0,w,h);const top=48,bot=118;
+ TS=Math.max(20,Math.min(60,Math.floor(Math.min((w-8)/L.w,(h-top-bot)/L.h))));IO.x=Math.floor((w-L.w*TS)/2);IO.y=top+Math.max(0,Math.floor((h-top-bot-L.h*TS)/2));
+ for(let y=0;y<L.h;y++)for(let x=0;x<L.w;x++){const t=L.g[y][x],px=IO.x+x*TS,py=IO.y+y*TS;
+  if(t===1){ctx.fillStyle='#3e2723';ctx.fillRect(px,py,TS,TS);ctx.fillStyle='#6d4c41';ctx.fillRect(px,py,TS,TS*.28);ctx.fillStyle='#fcd11633';if(y===0&&x%3===1)ctx.fillRect(px+TS*.25,py+TS*.4,TS*.5,TS*.3)}
+  else if(t===9){ctx.fillStyle='#1b5e20';ctx.fillRect(px,py,TS,TS);ctx.fillStyle='#fff';ctx.font=`bold ${TS*.28}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('EXIT',px+TS/2,py+TS/2)}
+  else{const c=FLOORS[t]||FLOORS[2];ctx.fillStyle=(t===3?(x+y)%2:t===2?y%2:(x*3+y)%4===0)?c[1]:c[0];ctx.fillRect(px,py,TS,TS);if(t===2){ctx.fillStyle='#0001';ctx.fillRect(px+((y*7)%TS),py,1,TS)}}
+  if(L.doors.has(kk(L,x,y))&&t!==9&&y<L.h-2){ctx.fillStyle='#00000022';ctx.fillRect(px,py,TS,TS)}}
+ ctx.font=`bold ${Math.max(9,TS*.24)}px system-ui`;ctx.textAlign='left';ctx.textBaseline='top';ctx.fillStyle='#ffffff99';for(const r of L.rooms)ctx.fillText(r.name.toUpperCase(),IO.x+r.x0*TS+4,IO.y+r.y0*TS+3);
+ for(const o of L.objs)drawObj(o);
+ if(B.hold){drawObj(B.hold,true);const ok=canPlace(IN,B.hold);ctx.strokeStyle=ok?'#2ecc40':'#e74c3c';ctx.lineWidth=3;ctx.strokeRect(IO.x+B.hold.x*TS,IO.y+B.hold.y*TS,ow(B.hold)*TS,oh(B.hold)*TS)}
+ if(S.build){ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;for(let x=0;x<=L.w;x++){ctx.beginPath();ctx.moveTo(IO.x+x*TS,IO.y);ctx.lineTo(IO.x+x*TS,IO.y+L.h*TS);ctx.stroke()}for(let y=0;y<=L.h;y++){ctx.beginPath();ctx.moveTo(IO.x,IO.y+y*TS);ctx.lineTo(IO.x+L.w*TS,IO.y+y*TS);ctx.stroke()}}
+ const sims=L.npcs.map(n=>({x:n.x,y:n.y,o:{face:n.x<P.x?1:-1,walk:false,shirt:SHIRTS[n.i%SHIRTS.length],g:NPC[n.i].g,name:NPC[n.i].name.split(' ')[0]+(NPC[n.i].st!=='stranger'?' ❤️':''),act:true}}));
+ sims.push({x:P.x,y:P.y,o:{face:P.face,walk:P.path.length>0,ph:P.ph,shirt:S.gender==='Female'?'#d81b60':'#1e88e5',g:S.gender==='Female'?'f':'m',gem:mood(),act:!!P.act}});
+ sims.sort((a,b)=>a.y-b.y).forEach(s=>drawSim(IO.x+s.x*TS+TS/2,IO.y+s.y*TS+TS*.45,TS*.95,s.o));
+ if(P.act){const sx=IO.x+P.x*TS+TS/2,sy=IO.y+P.y*TS-TS*.95,bw=TS*1.8;ctx.fillStyle='#000c';rr(sx-bw/2,sy-TS*.55,bw,TS*.5+10,8);ctx.fill();ctx.font=Math.floor(TS*.38)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(P.act.e,sx,sy-TS*.3);
+  ctx.fillStyle='#333';ctx.fillRect(sx-bw/2+5,sy-TS*.05,bw-10,6);ctx.fillStyle='#2ecc40';ctx.fillRect(sx-bw/2+5,sy-TS*.05,(bw-10)*Math.min(1,P.act.t/P.act.dur),6)}
+ const hh=hr();if(hh<6||hh>=20){ctx.fillStyle='rgba(10,10,40,.25)';ctx.fillRect(0,0,w,h)}if(!S.power&&S.scene==='home'&&!S.items.includes('gen')){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,w,h)}}
+// ================= INPUT =================
+const cv=$('cv'),ctx=cv.getContext('2d'),cam={x:0,y:0};let VW=0,VH=0;
+function resize(){const dpr=window.devicePixelRatio||1;VW=window.innerWidth;VH=window.innerHeight;cv.width=VW*dpr;cv.height=VH*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+window.addEventListener('resize',resize);
+function tileAt(e){return S.scene?[Math.floor((e.clientX-IO.x)/TS),Math.floor((e.clientY-IO.y)/TS)]:[Math.floor((e.clientX+cam.x)/T),Math.floor((e.clientY+cam.y)/T)]}
+cv.addEventListener('pointermove',e=>{if(S&&S.scene&&S.build&&B.hold&&e.pointerType==='mouse'){const [tx,ty]=tileAt(e);B.hold.x=tx;B.hold.y=ty}});
+cv.addEventListener('pointerdown',e=>{if(!S||S.dead||panelOpen)return;hidePie();if(P.act){P.act=null;busy=false;toast('Stopped.')}
+ const [tx,ty]=tileAt(e);
+ if(S.scene){if(S.build)return buildTap(tx,ty);const np=IN.npcs.find(n=>n.x===tx&&(n.y===ty||n.y===ty+1));if(np)return talkTo(np.i);const o=occAt(IN,tx,ty);if(o)return goUse(o);
+  walkToTileIn(tx,ty);return}
+ const n=NPC.find(n=>Math.abs(n.x-tx)<1&&Math.abs(n.y-ty)<1);if(n){P.talk=NPC.indexOf(n);P.goal=null;const p=path(P.x,P.y,Math.round(n.x),Math.round(n.y));P.path=p||[];if(!P.path.length){P.talk=null;talkTo(NPC.indexOf(n))}return}
+ const b=ty>=0&&ty<H&&tx>=0&&tx<W?BM[ty][tx]:null;if(b)return walkTo(b);const p=path(P.x,P.y,tx,ty);if(p){P.path=p;const v=V.find(v=>v.dx===tx&&v.dy===ty);P.goal=v?v.id:null}});
+window.addEventListener('keydown',e=>{if(!S||$('start').style.display==='block')return;const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'){if(e.key==='Escape')closePanel();return}
+ const k=(e.key||'').toLowerCase(),pd=()=>e.preventDefault&&e.preventDefault();if(k==='escape'){hidePie();if(S.build&&B.hold)return cancelHold();return closePanel()}if(S.dead)return;
+ if(S.scene&&S.build&&!panelOpen){if(k==='r')return rotateHold();if(k==='enter')return placeHold();if(k==='delete'||k==='backspace')return sellHold();if(k==='b')return toggleBuild();if(k==='c')return openCatalog();
+  const d={arrowup:[0,-1],arrowdown:[0,1],arrowleft:[-1,0],arrowright:[1,0]}[k];if(d&&B.hold){pd();B.hold.x+=d[0];B.hold.y+=d[1]}return}
+ const cmd={m:S.scene?null:openMapApp,p:openPhone,i:openSim,t:thingsHere,e:peopleHere,h:goHome,b:S.scene==='home'?toggleBuild:null,x:S.scene?exitWalk:null}[k];if(cmd){pd();return cmd()}
+ if(k===' '){setSpeed(speed?0:1);pd();return}
+ if(panelOpen||P.act)return;
+ if((k==='f'||k==='enter')&&S.scene){const px=Math.round(P.x),py=Math.round(P.y);const o=IN.objs.find(o=>isAdj(o,px,py));if(o){faceTo(o);openObj(o)}return}
+ const d={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]}[k];if(d){pd();step(d)}});
+function step(d){if(P.path.length)return;hidePie();const cx=Math.round(P.x),cy=Math.round(P.y),nx=cx+d[0],ny=cy+d[1];if(d[0])P.face=d[0];
+ if(S.scene){if(walkIn(nx,ny)){P.path=[[nx,ny]];P.useObj=null}else{const o=occAt(IN,nx,ny);if(o){faceTo(o);openObj(o)}}return}
+ if(walk(nx,ny)){P.path=[[nx,ny]];const v=V.find(v=>v.dx===nx&&v.dy===ny);P.goal=v?v.id:null}
+ else if(ny>=0&&ny<H&&nx>=0&&nx<W&&BM[ny][nx]){const v=VB[BM[ny][nx]];if(v.dx===cx&&v.dy===cy)enterVenue(v)}}
+function setSpeed(s){speed=s;document.querySelectorAll('#speed button').forEach((b,i)=>b.className=[0,1,3][i]===s?'on':'')}
+// ================= LOOP =================
+let last=0,acc=0,saveT=0,frame=0;
+function update(dt){if(!S||S.dead)return;clockMs+=dt*1000;
+ if(P.path.length){const [tx,ty]=P.path[0],dx=tx-P.x,dy=ty-P.y,d=Math.hypot(dx,dy),sp=(S.scene?4:5)*dt;P.ph=(P.ph||0)+dt*14;if(dx)P.face=Math.sign(dx);
+  if(d<=sp){P.x=tx;P.y=ty;P.path.shift();if(speed)S.needs.e=cl(S.needs.e-.02);
+   if(!P.path.length){
+    if(S.scene){if(IN&&tx===IN.ex&&ty===IN.ey)leaveScene();else if(P.useObj){const o=P.useObj,a=P.autoAct;P.useObj=null;P.autoAct=null;faceTo(o);a!=null?runAuto(o,a):openObj(o)}}
+    else{if(P.goal){const v=VB[P.goal];P.goal=null;if(v.dx===tx&&v.dy===ty)enterVenue(v)}if(P.talk!=null){const i=P.talk;P.talk=null;talkTo(i)}}}}
+  else{P.x+=dx/d*sp;P.y+=dy/d*sp}}
+ if(P.act){const A_=P.act;A_.t+=dt;const target=Math.min(A_.mins,A_.mins*A_.t/A_.dur);let step=Math.floor(target-A_.done);
+  if(A_.t>=A_.dur)step=A_.mins-A_.done;if(step>0){busy=true;let left=step;while(left>0&&!S.dead){const s=Math.min(10,left);tick(s,A_.mins,A_.d);left-=s}busy=false;A_.done+=step}
+  if(A_.t>=A_.dur&&P.act===A_){P.act=null;A_.onDone()}}
+ else if(!panelOpen&&speed){acc+=dt*2*speed;if(acc>=1){const m=Math.floor(acc);acc-=m;tick(m)}}
+ for(const n of NPC){if(n.path.length){const [tx,ty]=n.path[0],dx=tx-n.x,dy=ty-n.y,d=Math.hypot(dx,dy),sp=2.2*dt;n.ph=(n.ph||0)+dt*10;if(dx)n.face=Math.sign(dx);if(d<=sp){n.x=tx;n.y=ty;n.path.shift()}else{n.x+=dx/d*sp;n.y+=dy/d*sp}}
+  else if(--n.wait<0){const v=pick(V);n.path=path(n.x,n.y,v.dx,v.dy)||[];n.wait=R(120,600)}}
+ if(S.scene==='home'&&S.furn&&S.furn.tier!==S.home){reenterHome();toast('🏠 Your home changed.')}
+ if(pendingShift){pendingShift=false;doShift(true)}
+ if(pendingEvent&&!panelOpen&&!P.act){pendingEvent=false;randomEvent()}
+ if(S.needs.e<=0&&!busy&&!P.act){S.needs.e=40;S.money=Math.max(0,S.money-50);busy=true;advance(240);busy=false;toast('😵 You collapsed from exhaustion! Someone took GH₵50.');log('😵 Collapsed from exhaustion.')}
+ if(S.needs.b<=0){S.needs.b=100;S.needs.y=0;S.needs.f=cl(S.needs.f-30);toast('😳 Bladder accident! Hygiene ruined.');log('😳 Embarrassing accident.')}
+ if(S.health<=0)die();
+ const nw=netWorth();if(S.money>=10000)ach('first10k','First GH₵10,000');if(nw>=100000)ach('rich100k','Net worth GH₵100,000');if(nw>=1000000)ach('millionaire','Cedi millionaire');
+ if(nw>=500000&&S.dream==='landlord')dreamDone();if(sl('music')>=10&&S.dream==='star')dreamDone();if(S.funded&&S.dream==='unicorn')dreamDone();
+ if((saveT+=dt)>10){saveT=0;save()}}
+function drawCity(){const w=VW,h=VH;ctx.fillStyle='#1b5e20';ctx.fillRect(0,0,w,h);
+ cam.x=Math.max(-40,Math.min(W*T-w+40,P.x*T+T/2-w/2));cam.y=Math.max(-60,Math.min(H*T-h+120,P.y*T+T/2-h/2));
+ const x0=Math.max(0,Math.floor(cam.x/T)),y0=Math.max(0,Math.floor(cam.y/T)),x1=Math.min(W,x0+Math.ceil(w/T)+2),y1=Math.min(H,y0+Math.ceil(h/T)+2);
+ ctx.save();ctx.translate(-cam.x,-cam.y);
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const t=G[y][x],px=x*T,py=y*T;
+  ctx.fillStyle=t===1?'#3b3f42':t===2?'#e8cf8f':t===3?((x+y+(frame>>5))%2?'#1e88e5':'#1976d2'):((x*7+y*3)%5?'#2e7d32':'#33873a');ctx.fillRect(px,py,T,T);
+  if(t===1){ctx.fillStyle='#fdd835';if([6,17,28].includes(y)&&x%2===0&&![7,20,33,44].includes(x))ctx.fillRect(px+8,py+15,16,2);if([7,20,33,44].includes(x)&&y%2===0&&![6,17,28].includes(y))ctx.fillRect(px+15,py+8,2,16)}}
+ ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='20px serif';
+ for(const t of TREES)if(t[0]>=x0&&t[0]<x1&&t[1]>=y0&&t[1]<y1)ctx.fillText(t[2],t[0]*T+16,t[1]*T+16);
+ for(const v of V){const px=v.x*T,py=v.y*T,bw=v.w*T,bh=v.h*T;if(px>cam.x+w||py>cam.y+h||px+bw<cam.x||py+bh<cam.y)continue;
+  ctx.fillStyle='#0005';ctx.fillRect(px+5,py+5,bw,bh);ctx.fillStyle=v.c;ctx.fillRect(px,py,bw,bh);ctx.fillStyle='#0003';ctx.fillRect(px,py,bw,10);
+  ctx.strokeStyle='#0006';ctx.lineWidth=2;ctx.strokeRect(px+1,py+1,bw-2,bh-2);
+  const lit=hr()>=18||hr()<6;ctx.fillStyle=lit?'#ffe08299':'#ffffff66';for(let wx=px+8;wx<px+bw-12;wx+=18)for(let wy=py+18;wy<py+bh-26;wy+=20)ctx.fillRect(wx,wy,8,8);
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=Math.min(40,bh*.45)+'px serif';ctx.fillText(v.e,px+bw/2,py+bh/2);
+  const nm=v.id==='home'?HOMES[S.home][0]:v.name;ctx.font='bold 11px system-ui';const tw=ctx.measureText(nm).width+8;ctx.fillStyle='#000b';ctx.fillRect(px+bw/2-tw/2,py+bh-18,tw,15);ctx.fillStyle=isOpen(v)||v.id==='home'?'#fff':'#f88';ctx.fillText(nm,px+bw/2,py+bh-10);
+  ctx.fillStyle='#4e342e';ctx.fillRect(v.dx*T+8,v.dy*T,16,5);
+  if(S.job&&CB[S.job.id].v===v.id){ctx.font='18px serif';ctx.fillText('💼',px+bw-12,py+14)}}
+ NPC.forEach((n,i)=>{if(n.x*T<cam.x-40||n.x*T>cam.x+w+40||n.y*T<cam.y-60||n.y*T>cam.y+h+40)return;drawSim(n.x*T+16,n.y*T+14,30,{face:n.face||1,walk:n.path.length>0,ph:n.ph||0,shirt:SHIRTS[i%SHIRTS.length],g:n.g,name:Math.hypot(n.x-P.x,n.y-P.y)<4?n.name.split(' ')[0]+(n.st!=='stranger'?' ❤️':''):null})});
+ if(P.path.length){ctx.fillStyle='#fcd11666';for(const [x,y] of P.path)ctx.fillRect(x*T+13,y*T+13,6,6)}
+ drawSim(P.x*T+16,P.y*T+14,34,{face:P.face,walk:P.path.length>0,ph:P.ph||0,shirt:S.gender==='Female'?'#d81b60':'#1e88e5',g:S.gender==='Female'?'f':'m',gem:mood()});
+ ctx.restore();
+ const hh=hr(),dark=hh<5?.55:hh<7?.55-(hh-5)*.27:hh>=19?Math.min(.55,(hh-19)*.25):0;if(dark>0){ctx.fillStyle=`rgba(5,10,40,${dark})`;ctx.fillRect(0,0,w,h)}}
+function draw(){if(!S){ctx.fillStyle='#1b5e20';ctx.fillRect(0,0,VW,VH);return}if(S.scene&&IN)drawInterior();else drawCity()}
+function hud(){if(!S)return;$('money').textContent=fmt(S.money);const c=S.job&&CB[S.job.id];
+ $('clock').textContent=`${DOW[dow()]} ${hhmm(S.t)} · Wk${Math.floor(day()/7)+1} · Age ${S.age}`;
+ $('loc').textContent=S.scene?(S.build?'🔨 Build mode':'📍 '+(S.scene==='home'?HOMES[S.home][0]:VB[S.scene].name)):(c&&workday(c,day())&&S.job.lastWorked!==day()&&day()>=S.job.startDay&&hr()<c.st+1?`💼 Shift ${c.st}:00 @ ${VB[c.v].name}`:'Accra streets');
+ $('needs').innerHTML=NEEDS.map(n=>{const x=S.needs[n[0]];return`<div class="nd">${n[1]} ${n[2]}<div class="nb"><div style="width:${x}%;background:${x>50?'#4caf50':x>25?'#fbc02d':'#e53935'}"></div></div></div>`}).join('')}
+function loop(ts){const dt=Math.min(.1,((ts-last)/1000)||0);last=ts;frame++;try{update(dt);draw();if(frame%10===0)hud()}catch(err){console.error(err)}requestAnimationFrame(loop)}
+// ================= BOOT =================
+resize();setSpeed(1);
+try{const d=JSON.parse(localStorage.getItem('ghanaLife2'));if(d&&d.v===3&&!d.dead){S=d;NPC=(S.npcs||mkNPCs()).map(n=>Object.assign({},n,{path:[],chat:n.chat||[]}));P.x=S.px!=null?S.px:VB.home.dx;P.y=S.py!=null?S.py:VB.home.dy;
+ if(S.scene){const sc=S.scene;S.scene=null;S.build=false;enterVenue(VB[sc])}}}catch(e){console.error(e)}
+updBar();if(!S)startScreen();else toast('Welcome back to Accra 👋🏿');
+window.addEventListener('beforeunload',save);
+requestAnimationFrame(loop);
+</script></body></html>

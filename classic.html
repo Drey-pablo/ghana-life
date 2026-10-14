@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hemsworthlogan.goatcounter.com; connect-src 'self' https://uwpfxciximmyfvfmphhi.supabase.co wss://uwpfxciximmyfvfmphhi.supabase.co https://hemsworthlogan.goatcounter.com; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghana Life</title>
+<style>
+:root{--r:#ce1126;--y:#fcd116;--g:#006b3f;--bg:#111;--c:#1d1d1d}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:#eee}
+header{background:linear-gradient(90deg,var(--r),var(--y),var(--g));padding:10px;text-align:center;color:#000;font-weight:800;font-size:1.3em}
+header span{background:#000;color:var(--y);padding:0 6px;border-radius:4px}
+main{max-width:640px;margin:auto;padding:10px}
+.card{background:var(--c);border-radius:10px;padding:12px;margin-bottom:10px}
+.bar{height:12px;background:#333;border-radius:6px;overflow:hidden;margin:3px 0 8px}.bar div{height:100%;transition:width .3s}
+.row{display:flex;justify-content:space-between;font-size:.9em}
+button{background:var(--g);color:#fff;border:0;border-radius:8px;padding:10px;margin:3px;font-size:.95em;cursor:pointer}
+button.alt{background:#444}button.big{background:var(--r);width:100%;font-size:1.2em;font-weight:700}
+button:disabled{opacity:.4}
+#log{max-height:260px;overflow:auto;font-size:.9em}#log p{margin:4px 0;border-bottom:1px solid #2a2a2a;padding-bottom:4px}
+#log b{color:var(--y)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px}
+#modal{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:10px;z-index:9}
+#modal .card{max-width:480px;width:100%;max-height:90vh;overflow:auto}
+input,select{width:100%;padding:8px;margin:4px 0 10px;border-radius:6px;border:0}
+small{color:#aaa}
+</style></head><body>
+<header>🇬🇭 Ghana <span>Life</span></header>
+<main id="app"></main>
+<div id="modal"><div class="card" id="mbody"></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, pick=a=>a[R(0,a.length-1)], cl=v=>Math.max(0,Math.min(100,v));
+const fmt=n=>'GH₵'+Math.round(n).toLocaleString();
+const CITIES={Accra:{cost:1.3,hoods:['Nima','Osu','East Legon','Madina','Kaneshie']},Kumasi:{cost:1.0,hoods:['Adum','Bantama','Asokwa','Ahodwo']},Takoradi:{cost:0.95,hoods:['Market Circle','Anaji','Effiakuma']},Tamale:{cost:0.8,hoods:['Lamashegu','Vittin','Kalpohin']},'Cape Coast':{cost:0.9,hoods:['Abura','Pedu','Kotokuraba']},Ho:{cost:0.85,hoods:['Bankoe','Ahoe']}};
+const FIRST=['Kwame','Kofi','Yaw','Kwabena','Kwaku','Kwesi','Kojo','Ama','Akosua','Abena','Efua','Adwoa','Yaa','Afia','Fuseini','Abdul-Rahman','Mawuli','Selasi','Nana','Esi','Naa','Adjoa'];
+const LAST=['Mensah','Owusu','Boateng','Asante','Osei','Agyeman','Addo','Quaye','Tetteh','Amoah','Iddrisu','Abubakar','Dzifa','Ankrah','Nkrumah','Badu','Sarpong'];
+// Jobs: pay per year, req: edu level (0 none,1 JHS,2 SHS/WASSCE,3 degree), skill reqs, ladder
+const EDU=['None','JHS','SHS (WASSCE)','University Degree','Masters'];
+const JOBS=[
+ {id:'mate',name:'Trotro Mate',edu:0,skill:'hustle',ladder:['Mate','Driver','Trotro Owner'],pay:[6000,11000,24000]},
+ {id:'kenkey',name:'Kenkey Seller',edu:0,skill:'hustle',ladder:['Kenkey Seller','Chop Bar Owner','Restaurant Chain'],pay:[5000,14000,40000]},
+ {id:'okada',name:'Okada Rider',edu:0,skill:'hustle',ladder:['Okada Rider','Okada Fleet Owner'],pay:[8000,20000],risk:true},
+ {id:'farmer',name:'Cocoa Farmer',edu:0,skill:'hustle',ladder:['Farm Hand','Cocoa Farmer','Cocoa Estate Owner'],pay:[4000,10000,35000]},
+ {id:'tailor',name:'Seamstress / Tailor',edu:1,skill:'craft',ladder:['Apprentice','Kente & Kaba Designer','Fashion House CEO'],pay:[4000,15000,50000]},
+ {id:'teacher',name:'Teacher (GES)',edu:3,skill:'smarts',ladder:['Teacher','Senior Teacher','Headmaster'],pay:[30000,42000,60000],nss:true},
+ {id:'nurse',name:'Nurse',edu:3,skill:'smarts',ladder:['Staff Nurse','Senior Nurse','Matron'],pay:[34000,48000,70000],nss:true},
+ {id:'bank',name:'Banker',edu:3,skill:'charm',ladder:['Teller','Relationship Officer','Branch Manager','MD'],pay:[40000,65000,110000,300000],nss:true},
+ {id:'tech',name:'Tech Startup',edu:2,skill:'code',ladder:['Junior Dev','Senior Dev','CTO','Unicorn Founder'],pay:[30000,70000,150000,600000]},
+ {id:'music',name:'Highlife/Afrobeats Artiste',edu:0,skill:'music',ladder:['Upcoming Act','Radio Rotation','VGMA Winner','Global Star'],pay:[2000,20000,120000,500000]},
+ {id:'mp',name:'Politician',edu:3,skill:'charm',ladder:['Assemblyman','DCE','MP','Minister'],pay:[20000,60000,180000,350000],nss:true},
+];
+const FOOD=[['Waakye',15,4,0],['Kenkey & Fish',20,3,0],['Banku & Tilapia',60,6,1],['Fufu & Light Soup',45,6,1],['Jollof (Ghana is better)',35,7,0],['Kelewele',10,4,-1],['Red-red',18,3,2],['Tuo Zaafi',20,3,2],['Fan Ice',5,5,-1]];
+const ASSETS=[['Phone (Tecno)',1500,'item'],['Okada motorbike',9000,'item'],['Used Toyota Vitz',60000,'car'],['Land in Kasoa',40000,'land'],['Chamber & Hall',150000,'house'],['East Legon Mansion',2500000,'house'],['Benz C-Class',350000,'car']];
+const HOMES=[['Family house',0],['Single room (compound)',2400],['Chamber & Hall (rent)',6000],['2-Bedroom flat',18000],['Airport Residential apt',80000]];
+let S=null;
+function save(){localStorage.setItem('ghanaLife',JSON.stringify(S))}
+function load(){try{S=JSON.parse(localStorage.getItem('ghanaLife'))}catch(e){S=null}}
+function log(t){S.log.unshift(`<b>Age ${S.age}:</b> ${t}`);S.log=S.log.slice(0,150)}
+function modal(html){$('#mbody').innerHTML=html;$('#modal').style.display='flex'}
+function close_(){$('#modal').style.display='none';render()}
+function stat(n,v,c){return `<div class="row"><span>${n}</span><span>${Math.round(v)}%</span></div><div class="bar"><div style="width:${v}%;background:${c}"></div></div>`}
+function newGame(){
+ const cityOpts=Object.keys(CITIES).map(c=>`<option>${c}</option>`).join('');
+ $('#app').innerHTML=`<div class="card"><h2>Start a new life</h2>
+ <label>First name<input id="fn" value="${pick(FIRST)}"></label><label>Surname<input id="ln" value="${pick(LAST)}"></label>
+ <label>Gender<select id="gd"><option>Male</option><option>Female</option></select></label>
+ <label>City<select id="ct">${cityOpts}</select></label>
+ <label>Trait<select id="tr"><option value="hustle">Hustler (hustle grows fast)</option><option value="code">Tech Genius (code grows fast)</option><option value="charm">Smooth Talker (charm grows fast)</option><option value="music">Musical (music grows fast)</option><option value="craft">Creative Hands (craft grows fast)</option><option value="chill">Cool Head (happiness drains slower)</option></select></label>
+ <small>Your family background is decided by the <b>Birth Lottery</b> 🎲</small><br><br>
+ <button class="big" onclick="startLife()">Be Born 👶</button></div>`;
+}
+function startLife(){
+ const rich=Math.random()<0.2;const city=$('#ct').value;
+ S={name:$('#fn').value+' '+$('#ln').value,gender:$('#gd').value,city,hood:pick(CITIES[city].hoods),trait:$('#tr').value,
+  age:0,health:R(70,100),happy:R(70,100),smarts:R(30,90),looks:R(30,95),money:0,bank:0,
+  bg:rich?'Big Man Pikin':'Hustle Pikin',familyRich:rich,edu:0,school:'',wassce:null,nss:false,
+  skills:{hustle:0,code:0,charm:0,music:0,craft:0},job:null,level:0,perf:50,yearsInJob:0,
+  home:0,assets:[],rel:[{n:'Maame (Mother)',t:'parent',v:80},{n:'Papa (Father)',t:'parent',v:75}],partner:null,kids:0,
+  dead:false,log:[],actions:3,debt:0};
+ if(rich){S.money=50000;S.rel.push({n:'Uncle in Abroad',t:'family',v:60});}
+ if(Math.random()<.6)S.rel.push({n:pick(FIRST)+' (sibling)',t:'sibling',v:70});
+ log(`Born in ${S.hood}, ${city}. Birth Lottery: <b>${S.bg}</b>${rich?' — Daddy dey! Trust fund of GH₵50,000.':' — no silver spoon, only grace.'}`);
+ save();render();
+}
+function addSkill(k,n){if(!S.skills[k]&&S.skills[k]!==0)return;S.skills[k]=Math.min(100,S.skills[k]+n*(S.trait===k?2:1))}
+function render(){
+ if(!S){newGame();return}
+ const j=S.job?JOBS.find(x=>x.id===S.job):null;
+ $('#app').innerHTML=`
+ <div class="card"><h3 style="margin:0">${S.name} ${S.dead?'🪦':''}</h3>
+ <small>${S.gender}, age ${S.age} · ${S.hood}, ${S.city} · ${S.bg} · ${EDU[S.edu]}${S.school?' · studying: '+S.school:''}</small><br>
+ <small>${j?`💼 ${j.ladder[S.level]} (${j.name}) · ${fmt(j.pay[S.level])}/yr · performance ${Math.round(S.perf)}%`:'💼 Unemployed'} · 🏠 ${HOMES[S.home][0]}</small>
+ <h2 style="margin:6px 0;color:var(--y)">${fmt(S.money)} ${S.debt>0?`<small style="color:#f66">debt ${fmt(S.debt)}</small>`:''}</h2>
+ ${stat('❤️ Health',S.health,'#e33')}${stat('😊 Happiness',S.happy,'#fc1')}${stat('🧠 Smarts',S.smarts,'#39f')}${stat('✨ Looks',S.looks,'#c6f')}
+ <small>Skills: ${Object.entries(S.skills).map(([k,v])=>k+' '+Math.round(v)).join(' · ')}</small></div>
+ ${S.dead?`<button class="big" onclick="reset_()">New Life</button>`:`<button class="big" onclick="ageUp()">Age +1 year 🎂</button>
+ <div class="card"><small>Actions left this year: ${S.actions}</small><div class="grid">
+ <button onclick="schoolMenu()">🎓 Education</button><button onclick="jobMenu()">💼 Jobs</button>
+ <button onclick="workHard()">💪 Work hard</button><button onclick="foodMenu()">🍲 Chop</button>
+ <button onclick="actMenu()">🎉 Activities</button><button onclick="relMenu()">👪 Relationships</button>
+ <button onclick="assetMenu()">🏠 Assets & Home</button><button onclick="moveMenu()">🚌 Move city</button>
+ <button class="alt" onclick="reset_()">♻️ Restart</button></div></div>`}
+ <div class="card" id="log">${S.log.map(l=>'<p>'+l+'</p>').join('')}</div>`;
+}
+function useAct(){if(S.actions<=0){modal(`<p>No energy left this year. Age up to continue!</p><button onclick="close_()">OK</button>`);return false}S.actions--;return true}
+function reset_(){if(S&&!S.dead&&!confirm('Abandon this life?'))return;localStorage.removeItem('ghanaLife');S=null;render()}
+// ---------- Education
+function schoolMenu(){
+ let h='<h3>Education</h3>';
+ if(S.age<6)h+='<p>Too young. Play with your toys small.</p>';
+ else if(S.school)h+=`<p>You are in ${S.school}.</p><button onclick="study()">📚 Study hard (+smarts)</button><button class="alt" onclick="dropOut()">Drop out</button>`;
+ else{
+  if(S.edu===2&&S.wassce==='pass'&&S.age>=17)h+=`<button onclick="enroll('University (UG/KNUST/UCC)')">Apply to University (fees ${fmt(6000)}/yr)</button>`;
+  if(S.edu===2&&S.wassce==='fail')h+=`<button onclick="rewrite()">Re-sit WASSCE (${fmt(800)})</button>`;
+  if(S.edu===3&&!S.nss)h+='<p>Complete National Service (NSS) — it happens automatically when you age up.</p>';
+  if(S.edu===3&&S.nss)h+=`<button onclick="enroll('Masters programme')">Masters (${fmt(20000)}/yr)</button>`;
+  h+=`<button onclick="learn('code')">💻 Coding bootcamp (${fmt(1500)})</button><button onclick="learn('craft')">🧵 Apprenticeship (${fmt(500)})</button><button onclick="learn('music')">🎤 Music lessons (${fmt(700)})</button>`;
+ }
+ modal(h+'<br><button class="alt" onclick="close_()">Close</button>');
+}
+function study(){if(!useAct())return;S.smarts=cl(S.smarts+R(3,7));S.happy=cl(S.happy-2);log('You studied hard. Books dey your head.');close_()}
+function dropOut(){log(`You dropped out of ${S.school}.`);S.school='';S.happy=cl(S.happy+5);close_()}
+function enroll(s){const fee=s.startsWith('Masters')?20000:6000;if(S.money<fee){modal('<p>No money for fees. Try a scholarship by keeping smarts high, or work first.</p><button onclick="close_()">OK</button>');return}
+ if(s.startsWith('Univ')&&S.smarts<45&&Math.random()<.5){log('Your university application was rejected. Aggregate no reach.');close_();return}
+ S.money-=fee;S.school=s;S.schoolYears=0;log(`Enrolled in ${s}.`);close_()}
+function rewrite(){if(S.money<800)return close_();S.money-=800;if(S.smarts+R(0,40)>60){S.wassce='pass';log('Re-sit WASSCE: you PASSED! 🎉')}else log('Re-sit WASSCE: failed again. Hmm.');close_()}
+function learn(k){const c={code:1500,craft:500,music:700}[k];if(S.age<12){modal('<p>Too young.</p><button onclick="close_()">OK</button>');return}if(S.money<c){modal('<p>Not enough cash.</p><button onclick="close_()">OK</button>');return}if(!useAct())return;S.money-=c;addSkill(k,R(8,15));log(`You trained your ${k} skill.`);close_()}
+// ---------- Jobs
+function jobReqOk(j){return S.edu>=j.edu&&(!j.nss||S.nss)}
+function jobMenu(){
+ if(S.age<15){modal('<p>You are too young to work (child labour no be am!).</p><button onclick="close_()">OK</button>');return}
+ let h='<h3>Job Board</h3>';
+ if(S.job){const j=JOBS.find(x=>x.id===S.job);h+=`<p>Current: ${j.ladder[S.level]}</p>`;
+  if(S.level<j.ladder.length-1)h+=`<button onclick="askPromo()">Ask for promotion (needs ${j.skill} ${(S.level+1)*25}, performance 80+)</button>`;
+  h+=`<button class="alt" onclick="quit()">Quit job</button><hr>`}
+ h+=JOBS.map(j=>`<button ${jobReqOk(j)&&!S.school?'':'disabled'} onclick="apply('${j.id}')">${j.name}<br><small>${fmt(j.pay[0])}/yr · ${EDU[j.edu]}${j.nss?'+NSS':''}</small></button>`).join('');
+ modal(h+'<br><button class="alt" onclick="close_()">Close</button>');
+}
+function apply(id){const j=JOBS.find(x=>x.id===id);if(id==='okada'&&!S.assets.includes('Okada motorbike')&&Math.random()<.5){log('Okada job: the owner wanted you to "work and pay". You declined.');close_();return}
+ if(Math.random()<.25+S.smarts/200+S.skills[j.skill]/200){S.job=id;S.level=0;S.perf=50;S.yearsInJob=0;log(`Hired as ${j.ladder[0]}!`)}else log(`${j.name} application: "We will call you." They never called.`);close_()}
+function askPromo(){const j=JOBS.find(x=>x.id===S.job);if(!useAct())return;
+ if(S.skills[j.skill]>=(S.level+1)*25&&S.perf>=80){S.level++;S.perf=50;log(`PROMOTED to ${j.ladder[S.level]}! 🎉`);S.happy=cl(S.happy+15)}else log('Promotion denied. Boss says "next year".');close_()}
+function quit(){log('You quit your job.');S.job=null;close_()}
+function workHard(){if(!S.job){modal('<p>You no get work.</p><button onclick="close_()">OK</button>');return}if(!useAct())return;const j=JOBS.find(x=>x.id===S.job);S.perf=cl(S.perf+R(8,18));addSkill(j.skill,R(3,6));S.health=cl(S.health-2);log('You worked extra hard this year.');render()}
+// ---------- Food / activities
+function foodMenu(){modal('<h3>Chop bar</h3>'+FOOD.map((f,i)=>`<button onclick="eat(${i})">${f[0]}<br><small>${fmt(f[1])}</small></button>`).join('')+'<br><button class="alt" onclick="close_()">Close</button>')}
+function eat(i){const f=FOOD[i];if(S.money<f[1]&&S.age>=18){log('No money to chop. Hunger dey bite.');close_();return}if(S.age>=18)S.money-=f[1];S.happy=cl(S.happy+f[2]);S.health=cl(S.health+f[3]);log(`You enjoyed ${f[0]}.`);close_()}
+function actMenu(){modal(`<h3>Activities</h3>
+<button onclick="act('gym')">🏋️ Gym / jog at Legon</button><button onclick="act('beach')">🏖️ Labadi / Busua beach (GH₵100)</button>
+<button onclick="act('church')">⛪ Church / Mosque</button><button onclick="act('club')">🎶 Osu nightlife (GH₵300)</button>
+<button onclick="act('doctor')">🏥 Hospital (GH₵250)</button><button onclick="act('herbal')">🌿 Herbalist (GH₵50)</button>
+<button onclick="act('lotto')">🎟️ NLA Lotto (GH₵20)</button><button onclick="act('sakawa')">💻 Sakawa (risky!)</button>
+<button onclick="act('read')">📖 Read at library</button>
+<br><button class="alt" onclick="close_()">Close</button>`)}
+function pay(n){if(S.money<n){modal('<p>Not enough money.</p><button onclick="close_()">OK</button>');return false}S.money-=n;return true}
+function act(a){if(!useAct())return;
+ switch(a){
+ case'gym':S.health=cl(S.health+R(3,8));S.looks=cl(S.looks+R(0,3));log('You exercised. Body dey kakra.');break;
+ case'beach':if(!pay(100))return S.actions++;S.happy=cl(S.happy+R(6,12));log('Chilled at the beach with coconut.');break;
+ case'church':S.happy=cl(S.happy+R(2,6));addSkill('charm',2);log('You prayed. Spirit dey high.');break;
+ case'club':if(!pay(300))return S.actions++;S.happy=cl(S.happy+R(8,15));S.health=cl(S.health-R(1,5));addSkill('charm',3);if(Math.random()<.25&&!S.partner&&S.age>=18)meet();else log('You partied in Osu till dawn.');break;
+ case'doctor':if(!pay(250))return S.actions++;S.health=cl(S.health+R(10,25));log('Doctor treated you. NHIS covered small.');break;
+ case'herbal':if(!pay(50))return S.actions++;const d=R(-10,15);S.health=cl(S.health+d);log(d>0?'The herbal mixture worked!':'The "bitters" made you worse.');break;
+ case'lotto':if(!pay(20))return S.actions++;if(Math.random()<.02){S.money+=50000;log('YOU WON GH₵50,000 in the lotto!!! 🎉')}else log('Lotto: no win. "Next week".');break;
+ case'sakawa':if(S.age<16){S.actions++;log('Too young.');break}if(Math.random()<.4){log('Police arrested you for fraud! Jail for 2 years, all money seized.');S.money=0;S.job=null;S.happy=cl(S.happy-40);S.age+=1}else{const g=R(2000,20000);S.money+=g;S.happy=cl(S.happy-5);log(`Sakawa paid ${fmt(g)}. Your conscience dey worry you.`)}break;
+ case'read':S.smarts=cl(S.smarts+R(2,5));log('You read a book.');break}
+ close_()}
+// ---------- Relationships
+function meet(){const n=pick(FIRST)+' '+pick(LAST);S.rel.push({n,t:'date',v:R(40,70)});log(`You met ${n} and started dating 💕`)}
+function relMenu(){let h='<h3>Relationships</h3>';
+ h+=S.rel.map((r,i)=>`<div class="row"><span>${r.n} <small>(${r.t})</small></span><span>${r.v}%</span></div><div class="bar"><div style="width:${r.v}%;background:#f6a"></div></div>
+ <button onclick="spend(${i})">Spend time</button>${r.t==='parent'&&S.age<25?`<button onclick="askMoney(${i})">Ask for money</button>`:''}${r.t==='date'&&S.age>=18?`<button onclick="propose(${i})">Propose / Knocking 💍</button>`:''}${r.t==='spouse'?`<button onclick="baby(${i})">Try for baby 👶</button>`:''}`).join('<hr>');
+ if(S.age>=16)h+=`<hr><button onclick="date()">💘 Look for love</button>`;
+ modal(h+'<br><button class="alt" onclick="close_()">Close</button>')}
+function spend(i){if(!useAct())return;S.rel[i].v=Math.min(100,S.rel[i].v+R(5,15));S.happy=cl(S.happy+3);log(`Spent time with ${S.rel[i].n}.`);close_()}
+function askMoney(i){if(!useAct())return;const r=S.rel[i];if(Math.random()<r.v/150){const g=S.familyRich?R(2000,20000):R(20,300);S.money+=g;log(`${r.n} gave you ${fmt(g)}.`)}else{r.v-=5;log(`${r.n}: "Do I look like a bank?!"`)}close_()}
+function date(){if(!useAct())return;if(Math.random()<(S.looks+S.skills.charm)/150)meet();else log('No luck in love this time. You were "friendzoned".');close_()}
+function propose(i){const r=S.rel[i];const cost=Math.round(5000*CITIES[S.city].cost);if(S.money<cost){modal(`<p>Knocking & engagement items cost ${fmt(cost)} (schnapps, cloth, bride price...). Save up!</p><button onclick="close_()">OK</button>`);return}
+ if(Math.random()<r.v/100){S.money-=cost;r.t='spouse';S.partner=r.n;S.happy=cl(S.happy+20);log(`You performed the knocking rites and married ${r.n}! 💍`)}else{S.rel.splice(i,1);S.happy=cl(S.happy-15);log(`${r.n} said NO and left you.`)}close_()}
+function baby(i){if(!useAct())return;if(Math.random()<.4){S.kids++;const n=pick(FIRST);S.rel.push({n:n+' (child)',t:'child',v:90});S.happy=cl(S.happy+15);log(`Your baby ${n} was born! Outdooring ceremony held 👶`)}else log('No baby this year.');close_()}
+// ---------- Assets
+function assetMenu(){let h='<h3>Assets</h3><p>Owned: '+(S.assets.join(', ')||'nothing')+'</p>';
+ h+=ASSETS.map((a,i)=>`<button ${S.assets.includes(a[0])?'disabled':''} onclick="buy(${i})">${a[0]}<br><small>${fmt(a[1])}</small></button>`).join('');
+ if(S.assets.length)h+='<hr>'+S.assets.map((a,i)=>`<button class="alt" onclick="sell(${i})">Sell ${a}</button>`).join('');
+ h+='<h3>Housing (rent/yr, adjusted to city)</h3>'+HOMES.map((x,i)=>`<button ${i===S.home?'disabled':''} onclick="home(${i})">${x[0]}<br><small>${fmt(x[1]*CITIES[S.city].cost)}/yr</small></button>`).join('');
+ modal(h+'<br><button class="alt" onclick="close_()">Close</button>')}
+function buy(i){if(S.age<18){log('Too young to buy property.');return close_()}const a=ASSETS[i];if(!pay(a[1]))return;S.assets.push(a[0]);S.happy=cl(S.happy+8);log(`You bought ${a[0]}.`);close_()}
+function sell(i){const a=ASSETS.find(x=>x[0]===S.assets[i]);const v=a[2]==='land'||a[2]==='house'?a[1]*R(110,160)/100:a[1]*.5;S.money+=v;log(`Sold ${a[0]} for ${fmt(v)}.`);S.assets.splice(i,1);close_()}
+function home(i){if(S.age<18&&i>0){log('You must be 18 to rent.');return close_()}const adv=HOMES[i][1]*CITIES[S.city].cost*2;if(S.money<adv){modal(`<p>Landlord wants 2 years rent advance: ${fmt(adv)}</p><button onclick="close_()">OK</button>`);return}S.money-=adv;S.home=i;S.rentPaid=1;log(`Moved into ${HOMES[i][0]} (paid 2-year advance).`);close_()}
+function moveMenu(){modal('<h3>Move to...</h3>'+Object.keys(CITIES).filter(c=>c!==S.city).map(c=>`<button onclick="move('${c}')">${c}</button>`).join('')+'<br><button class="alt" onclick="close_()">Close</button>')}
+function move(c){if(!pay(200))return;S.city=c;S.hood=pick(CITIES[c].hoods);S.home=0;log(`Took the STC bus and moved to ${S.hood}, ${c}.`);close_()}
+// ---------- Yearly tick
+function ageUp(){
+ S.age++;S.actions=3;
+ // education
+ if(S.age===6){S.school='Basic School';log('Started Basic School. Uniform dey fit you.')}
+ if(S.school==='Basic School'&&S.age===15){S.school='';S.edu=1;log('Passed BECE! Finished JHS.');if(S.smarts>30||S.familyRich){S.school='SHS (Free SHS)';log('Placed in SHS under Free SHS policy.')}}
+ if(S.school&&S.school.startsWith('SHS')&&S.age===18){S.school='';S.edu=2;const sc=S.smarts+R(-15,20);S.wassce=sc>50?'pass':'fail';log(S.wassce==='pass'?'WASSCE results out: you PASSED 📜':'WASSCE results: you failed some papers. You can re-sit.')}
+ if(S.school&&S.school.startsWith('Univ')){S.schoolYears++;if(!pay2(6000)){log('Could not pay fees. Deferred university.');S.school=''}else if(S.schoolYears>=4){S.school='';S.edu=3;log('Graduated from university! 🎓 Time for NSS.')}}
+ else if(S.school&&S.school.startsWith('Masters')){S.schoolYears++;if(S.schoolYears>=2){S.school='';S.edu=4;S.smarts=cl(S.smarts+10);log('Completed your Masters!')}}
+ else if(S.edu===3&&!S.nss&&!S.school){S.nss=true;S.money+=R(6000,8000);log(`Did National Service (NSS) as a teaching assistant in ${pick(['Bolgatanga','Wa','Sefwi','Ho','Nkawkaw'])}. Allowance received.`)}
+ if(S.school)S.smarts=cl(S.smarts+R(1,4));
+ // job
+ if(S.job){const j=JOBS.find(x=>x.id===S.job);let p=j.pay[S.level]*(0.8+S.perf/250);S.money+=p;S.yearsInJob++;addSkill(j.skill,R(2,5));S.perf=cl(S.perf+R(-12,8));
+  if(S.perf<15){log('You were SACKED for poor performance.');S.job=null}
+  if(j.risk&&Math.random()<.08){S.health=cl(S.health-R(15,35));log('Okada accident! You were injured.')}}
+ // expenses
+ if(S.age>=18){const living=Math.round(3000*CITIES[S.city].cost)+(S.kids*2500);const rent=HOMES[S.home][1]*CITIES[S.city].cost;const tot=living+rent;S.money-=tot;if(S.money<0){S.debt+= -S.money;S.money=0;S.happy=cl(S.happy-10);log(`Couldn't cover living costs + rent (${fmt(tot)}). You're in debt!`);if(S.home>0&&S.debt>rent){S.home=0;log('Landlord threw your things outside. Back to family house.')}}
+  if(S.debt>0&&S.money>0){const r=Math.min(S.money,S.debt);S.money-=r;S.debt-=r}}
+ // drift
+ S.happy=cl(S.happy+R(-6,3)*(S.trait==='chill'?.5:1));
+ if(S.age>40)S.health=cl(S.health-R(0,4));if(S.age>60)S.health=cl(S.health-R(1,5));if(S.age>25)S.looks=cl(S.looks-R(0,2));
+ S.rel.forEach(r=>r.v=Math.max(0,r.v-R(0,6)));
+ // parents die
+ S.rel=S.rel.filter(r=>{if(r.t==='parent'&&S.age>25&&Math.random()<.04+S.age/1500){funeral(r.n);return false}return true});
+ // event
+ if(Math.random()<.75)randomEvent();
+ // death
+ if(S.health<=0||(S.age>60&&Math.random()<(S.age-60)/120)){S.dead=true;log(`💀 ${S.name} died at age ${S.age} with ${fmt(S.money)} and ${S.assets.length} assets. Damirifa due. 🖤`)}
+ save();render();
+}
+function pay2(n){if(S.money>=n){S.money-=n;return true}if(S.familyRich){log('Daddy paid your fees.');return true}return false}
+function funeral(n){const c=Math.round(R(8000,20000)*CITIES[S.city].cost);S.happy=cl(S.happy-25);log(`${n} passed away. Saturday funeral in black & red cloth. Funeral cost your share: ${fmt(Math.min(c,S.money))}.`);S.money=Math.max(0,S.money-c)}
+const EVENTS=[
+ {c:()=>true,t:'Harmattan season is here! Dust everywhere, lips cracking.',o:[['Buy shea butter (GH₵30)',()=>{S.money=Math.max(0,S.money-30);S.health=cl(S.health+3);return'Your skin glows like a celebrity.'}],['Endure it',()=>{S.health=cl(S.health-5);return'You caught a catarrh.'}]]},
+ {c:()=>true,t:'The Black Stars are playing in the AFCON final!',o:[['Watch at the local spot',()=>{const w=Math.random()<.5;S.happy=cl(S.happy+(w?20:-10));return w?'GHANA WINS! The whole street is jubilating 🇬🇭':'We lost on penalties. Heartbreak.'}],['Bet GH₵200 on Ghana',()=>{if(S.money<200)return'You no get money to bet.';const w=Math.random()<.45;S.money+=w?400:-200;return w?'Your bet won GH₵400!':'Lost the bet. Chale.'}]]},
+ {c:()=>true,t:'DUMSOR! Lights off for days. Your food in the fridge is spoiling.',o:[['Buy a generator (GH₵3,000)',()=>{if(S.money<3000)return'Too expensive. You sweat in the dark.';S.money-=3000;S.happy=cl(S.happy+5);return'You now get light while neighbours dey dark.'}],['Light candles and vibe',()=>{S.happy=cl(S.happy-8);return'Mosquitoes feasted on you.'}]]},
+ {c:()=>S.age>=18,t:'A family member at home asks you to send money "for an urgent matter".',o:[['Send GH₵500',()=>{if(S.money<500)return'You no get.';S.money-=500;S.rel.forEach(r=>{if(r.t!=='date')r.v=Math.min(100,r.v+8)});return'Family is proud of you.'}],['Ignore',()=>{S.rel.forEach(r=>{if(r.t==='parent')r.v-=10});return'They say "money has changed you".'}]]},
+ {c:()=>S.age>=18,t:'Your friend invites you to invest in a "double your money" scheme.',o:[['Invest GH₵2,000',()=>{if(S.money<2000)return'You no get.';S.money-=2000;if(Math.random()<.2){S.money+=4000;return'It actually paid! GH₵4,000.'}return'The scheme collapsed. Your money is gone (Menzgold vibes).'}],['Refuse',()=>'Wise decision.']]},
+ {c:()=>S.age>=10,t:'Malaria hit you hard.',o:[['Go to hospital',()=>{S.money=Math.max(0,S.money-150);S.health=cl(S.health-3);return'Treated quickly with ACTs.'}],['Take herbs',()=>{S.health=cl(S.health-R(5,20));return'You suffered for weeks.'}]]},
+ {c:()=>S.age>=16,t:'A police officer stops your trotro at a checkpoint and demands "something for the boys".',o:[['Give GH₵20',()=>{S.money=Math.max(0,S.money-20);return'You were waved through.'}],['Refuse',()=>{if(Math.random()<.5){S.happy=cl(S.happy-5);return'You were delayed for 2 hours.'}return'He let you go. Respect!'}]]},
+ {c:()=>true,t:'Homowo / Odwira festival time in town!',o:[['Join the festival',()=>{S.happy=cl(S.happy+12);return'Kpokpoi, drumming and dancing all day!'}],['Stay home',()=>'You rested instead.']]},
+ {c:()=>S.age>=18&&!!S.job,t:'Your boss asks you to work the weekend without overtime pay.',o:[['Accept',()=>{S.perf=cl(S.perf+15);S.happy=cl(S.happy-8);return'Boss is impressed.'}],['Refuse',()=>{S.perf=cl(S.perf-10);return'Boss is not happy.'}]]},
+ {c:()=>S.age>=18,t:'A wedding invite! Aseibi cloth costs GH₵400.',o:[['Buy cloth & attend',()=>{if(S.money<400)return'No money for cloth.';S.money-=400;S.happy=cl(S.happy+8);if(!S.partner&&Math.random()<.3){meet();return'You met someone at the reception!'}return'Jollof was sweet.'}],['Decline',()=>'You stayed home.']]},
+ {c:()=>S.age>=18&&S.money>1000,t:'The cedi depreciated badly against the dollar this year.',o:[['Convert savings to dollars',()=>{S.money*=.97;return'Your savings are protected (small fees paid).'}],['Do nothing',()=>{S.money*=.85;return'Your money lost 15% of its value.'}]]},
+ {c:()=>S.age>=12&&S.age<18,t:'Classmates are going to sneak out of the boarding house (dorm break).',o:[['Join them',()=>{if(Math.random()<.4){S.smarts=cl(S.smarts-5);return'Housemaster caught you. Suspended!'}S.happy=cl(S.happy+10);return'Epic night at the town.'}],['Stay and learn',()=>{S.smarts=cl(S.smarts+4);return'You aced the next test.'}]]},
+ {c:()=>S.age>=21,t:'Someone offers you a visa to "abroad" for GH₵15,000 via a connection man.',o:[['Pay',()=>{if(S.money<15000)return'You no get.';S.money-=15000;if(Math.random()<.35){S.money+=60000;return'It was real! You hustled in London for a year and returned with GH₵60,000.'}return'Fake visa. Connection man vanished.'}],['Refuse',()=>'Ghana is home.']]},
+ {c:()=>S.age>=18,t:'Election year! A party agent offers you GH₵200 to vote for his candidate.',o:[['Take it',()=>{S.money+=200;return'Money enter. Conscience small.'}],['Vote your conscience',()=>{S.happy=cl(S.happy+4);return'You inked your finger proudly.'}]]},
+];
+function randomEvent(){const ev=pick(EVENTS.filter(e=>e.c()));render();
+ modal(`<h3>📢 Age ${S.age}</h3><p>${ev.t}</p>`+ev.o.map((o,i)=>`<button onclick="choose(${EVENTS.indexOf(ev)},${i})">${o[0]}</button>`).join(''))}
+function choose(e,i){const r=EVENTS[e].o[i][1]();log(EVENTS[e].t+' → '+r);S.money=Math.round(S.money);save();close_()}
+load();render();
+</script></body></html>

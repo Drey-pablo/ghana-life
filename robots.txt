@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /ghana-life/stats.html
+
+Sitemap: https://drey-pablo.github.io/ghana-life/sitemap.xml

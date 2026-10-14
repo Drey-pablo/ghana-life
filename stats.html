@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hemsworthlogan.goatcounter.com; connect-src 'self' https://uwpfxciximmyfvfmphhi.supabase.co wss://uwpfxciximmyfvfmphhi.supabase.co https://hemsworthlogan.goatcounter.com; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Ghana Life — stats</title><style>
+body{font:14px system-ui,sans-serif;background:#0b1f17;color:#eee;margin:0;padding:16px}h1{color:#fcd116;font-size:22px;margin:0 0 4px}h2{font-size:15px;color:#fcd116;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.c{background:#12261d;border:1px solid #244;border-radius:12px;padding:12px;overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:12px}td,th{padding:3px 6px;border-bottom:1px solid #234;text-align:left;white-space:nowrap}th{opacity:.7}.bar{height:8px;background:#fcd116;border-radius:4px}
+input,button{font:14px system-ui;padding:8px;border-radius:8px;border:1px solid #446;background:#0f2a1f;color:#fff}button{background:#fcd116;color:#111;border:0;font-weight:700;cursor:pointer}.m{opacity:.7;font-size:12px}
+</style></head><body><h1>🇬🇭 Ghana Life — product stats</h1><div class="m">Aggregates only (no raw rows, no user ids). Private page: needs the secret from <code>stats_secret</code>.</div>
+<p><input id="k" type="password" placeholder="secret" size="30"> <select id="d"><option>7</option><option selected>30</option><option>90</option></select> days <button onclick="load()">Load</button> <span id="st" class="m"></span></p>
+<div id="out"></div>
+<script>
+const URL_='https://uwpfxciximmyfvfmphhi.supabase.co',KEY='sb_publishable_JKyBT3NpH2mCtX3ldHRnwg_HE5Q7FGP';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q=new URLSearchParams(location.hash.slice(1)||location.search);if(q.get('k'))document.getElementById('k').value=q.get('k');
+// keep the secret out of history/referrers
+if(location.search.includes('k=')||location.hash.includes('k='))history.replaceState(null,'',location.pathname);
+function tbl(rows,cols,barCol){if(!rows||!rows.length)return '<div class="m">No data yet.</div>';cols=cols||Object.keys(rows[0]);const mx=barCol?Math.max(...rows.map(r=>+r[barCol]||0),1):0;
+ return '<table><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+(barCol?'<th></th>':'')+'</tr>'+rows.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c])+'</td>').join('')+(barCol?'<td style="width:35%"><div class="bar" style="width:'+(100*(+r[barCol]||0)/mx).toFixed(0)+'%"></div></td>':'')+'</tr>').join('')+'</table>'}
+async function load(){const st=document.getElementById('st');st.textContent='Loading…';
+ try{const r=await fetch(URL_+'/rest/v1/rpc/gl_stats',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({p_secret:document.getElementById('k').value,p_days:+document.getElementById('d').value})});
+ if(!r.ok){st.textContent=r.status===403||r.status===401||r.status===400?'Wrong secret (or analytics.sql not run yet).':'Error '+r.status;return}
+ const j=await r.json();st.textContent='Updated '+new Date(j.generated).toLocaleString();
+ const S=(t,h)=>'<div class="c"><h2>'+t+'</h2>'+h+'</div>';
+ document.getElementById('out').innerHTML='<div class="g">'+
+  S('Daily active users',tbl(j.dau.slice().reverse(),['day','dau','sessions'],'dau'))+
+  S('Retention (cohorts)',tbl(j.retention.slice().reverse(),['cohort','users','d1_pct','d7_pct']))+
+  S('Session length',tbl(j.session_length.slice().reverse(),['day','sessions','median_s','avg_s']))+
+  S('Onboarding funnel',tbl(j.funnel,['step','users'],'users'))+
+  S('First-session drop-off',tbl(j.dropoff,['name','detail','sessions'],'sessions'))+
+  S('Top features (30d)',tbl(j.features,['name','detail','events','users'],'events'))+
+  S('Shares / invites / K',tbl(j.virality,['week','shares','invites','ref_joins','new_users','k_factor_approx']))+
+  S('Enzo',tbl(j.enzo.slice().reverse(),['day','entries','users','avg_stay_s','tables_bought','shows_watched']))+
+  S('School & street',tbl(j.school_street,['name','outcome','n','users'],'n'))+
+  S('Devices',tbl(j.devices,['device','users','sessions','avg_fps'],'users'))+
+  S('Errors',tbl(j.errors,['message','n','users','last_seen'],'n'))+'</div>'}catch(e){st.textContent='Network error'}}
+if(document.getElementById('k').value)load();
+</script></body></html>
